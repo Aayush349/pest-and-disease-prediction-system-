@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+
+# ML Models (too large)
+*.pt
+*.pth
+*.h5
+ml/data/raw/
+ml/data/processed/
+ml/models/
+
+# Environment
+.env
+*.log
+
+# Uploads
+backend/uploads/
+backend/temp/
+
+# Frontend
+node_modules/
+dist/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
