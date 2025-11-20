@@ -14,7 +14,7 @@ env/
 *.h5
 ml/data/raw/
 ml/data/processed/
-ml/models/
+
 
 # Environment
 .env

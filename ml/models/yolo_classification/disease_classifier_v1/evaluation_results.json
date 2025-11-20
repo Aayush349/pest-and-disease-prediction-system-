@@ -1,0 +1,6 @@
+{
+  "top1_accuracy": 0.9930863976478577,
+  "top5_accuracy": 0.9998916387557983,
+  "test_set": "..\\data\\processed\\test",
+  "model_path": "..\\models\\yolo_classification\\disease_classifier_v1\\weights\\best.pt"
+}

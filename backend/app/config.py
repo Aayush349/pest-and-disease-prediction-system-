@@ -69,6 +69,7 @@ class Settings(BaseSettings):
     # ============================================================
     MODEL_PATH: str = "ml/models/yolo_classification/disease_classifier_v1/weights/best.pt"
     KB_PATH: str = "ml/knowledge_base/diseases.json"
+    # KB_PATH: str = "../../../ml/knowledge_base/diseases.json"
 
     # ============================================================
     # Database

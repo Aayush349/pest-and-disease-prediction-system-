@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 API Router for Disease Prediction
-FINAL - Fixes URL prefix and seek() error.
+MERGED: Robust File Handling + Crop Filtering + Multilingual Support
 """
 
 from fastapi import APIRouter, File, UploadFile, HTTPException, Form
@@ -9,22 +9,32 @@ from pathlib import Path
 import shutil
 import json
 import sys
-from typing import Dict, Any
+from typing import Dict, Any, List
 
-# Go up from 'routers' to 'app', then import from 'ml' and 'config'
+# --- Imports ---
 from ..ml.disease_classifier import classify_disease
+from ..ml.translator import translate_response, get_supported_languages  # ✅ NEW: Translator
 from ..config import get_settings
 from ..models.schemas import PredictionResponse 
 from ..utils.logger import Logger 
 
-router = APIRouter(tags=["disease"]) # <-- 1. FIX: Removed prefix="/api/disease"
+# --- Initialization ---
+router = APIRouter(tags=["disease"]) 
 settings = get_settings()
-logger = Logger(__name__) # Initialize logger
+logger = Logger(__name__)
 
-# --- Load Knowledge Base ONCE when the app starts ---
+# --- Load Knowledge Base ONCE ---
 knowledge_base = {}
 try:
-    kb_path = (Path(__file__).parent / "../../../ml/knowledge_base/diseases.json").resolve()
+    # Try to find the KB file relative to this script
+    kb_path = (Path(__file__).parent.parent.parent / "ml/knowledge_base/diseases.json").resolve()
+    # kb_path = (Path(__file__).parent.parent.parent / "../../../ml/knowledge_base/diseases.json").resolve()
+    
+    # Fallback check for Docker/Production paths if needed
+    if not kb_path.exists():
+        kb_path = Path("ml/knowledge_base/diseases.json").resolve()
+        # kb_path = Path("../../../ml/knowledge_base/diseases.json").resolve()
+
     if kb_path.exists():
         with open(kb_path, encoding='utf-8') as f:
             knowledge_base = json.load(f)
@@ -33,10 +43,11 @@ try:
         logger.warning(f"❌ WARNING: Knowledge base file not found at {kb_path}")
 except Exception as e:
     logger.error(f"❌ CRITICAL ERROR: Failed to load knowledge base: {e}")
-# --- End of KB Load ---
 
 
-def get_treatment_for_disease(disease_name: str):
+# --- Helper Functions ---
+
+def get_treatment_for_disease(disease_name: str) -> List[str]:
     """Helper function to get treatment from the loaded knowledge base"""
     if disease_name in knowledge_base:
         treatment = knowledge_base[disease_name].get("treatment", ["USE_API_FALLBACK"])
@@ -46,33 +57,35 @@ def get_treatment_for_disease(disease_name: str):
         return treatment
     return ["Knowledge base entry not found."]
 
+def get_prevention_for_disease(disease_name: str) -> List[str]:
+    """Helper function to get prevention from the loaded knowledge base"""
+    if disease_name in knowledge_base:
+        return knowledge_base[disease_name].get("prevention", [])
+    return []
+
 def filter_predictions_by_crop(predictions: Dict[str, float], crop_type: str) -> Dict[str, float]:
     """Filters the model's predictions to only match the user's selected crop."""
-    if crop_type == "Unknown":
+    if not crop_type or crop_type == "Unknown":
         return predictions 
 
     filter_key = ""
-    if crop_type.lower() == "potato":
-        filter_key = "Potato___"
-    elif crop_type.lower() == "tomato":
-        filter_key = "Tomato___"
-    elif crop_type.lower() == "apple":
-        filter_key = "Apple___"
-    elif crop_type.lower() == "grape":
-        filter_key = "Grape___"
-    elif crop_type.lower() == "corn":
-        filter_key = "Corn_(maize)___"
-    elif crop_type.lower() == "cassava":
-        filter_key = "Cassava"
-    elif crop_type.lower() == "paddy":
+    crop_lower = crop_type.lower()
+    
+    if crop_lower == "potato": filter_key = "Potato___"
+    elif crop_lower == "tomato": filter_key = "Tomato___"
+    elif crop_lower == "apple": filter_key = "Apple___"
+    elif crop_lower == "grape": filter_key = "Grape___"
+    elif crop_lower == "corn": filter_key = "Corn_(maize)___"
+    elif crop_lower == "cassava": filter_key = "Cassava"
+    elif crop_lower == "paddy":
         paddy_diseases = ["bacterial_leaf_blight", "bacterial_leaf_streak", "bacterial_panicle_blight", "blast", "brown_spot", "dead_heart", "downy_mildew", "hispa", "normal", "tungro"]
-        filtered = {disease: prob for disease, prob in predictions.items() if disease in paddy_diseases}
+        filtered = {d: p for d, p in predictions.items() if d in paddy_diseases}
         return filtered if filtered else predictions
 
     if not filter_key:
         return predictions
 
-    filtered_predictions = {disease: prob for disease, prob in predictions.items() if disease.startswith(filter_key)}
+    filtered_predictions = {d: p for d, p in predictions.items() if d.startswith(filter_key)}
     return filtered_predictions if filtered_predictions else predictions
 
 def get_new_top_prediction(filtered_predictions: Dict[str, float]) -> Dict[str, Any]:
@@ -83,13 +96,17 @@ def get_new_top_prediction(filtered_predictions: Dict[str, float]) -> Dict[str, 
     top_confidence = filtered_predictions[top_disease]
     return {"disease": top_disease, "confidence": top_confidence}
 
-@router.post("/predict", response_model=PredictionResponse) # <-- This path is now correct: /api/disease/predict
+
+# --- Endpoints ---
+
+@router.post("/predict", response_model=PredictionResponse)
 async def predict_disease(
     file: UploadFile = File(...),
-    crop_type: str = Form("Unknown")
+    crop_type: str = Form("Unknown"),
+    language: str = Form("en")  # ✅ NEW: Language parameter via Form
 ):
     """
-    Upload image and get a CROP-FILTERED disease prediction
+    Upload image and get a CROP-FILTERED & TRANSLATED disease prediction
     """
     
     # Validate file type
@@ -102,19 +119,17 @@ async def predict_disease(
     file_path = upload_dir / f"temp_{file.filename}"
         
     try:
-        # --- 2. THIS IS THE FIX for seek() and NameError: 'offset' ---
-        # Save the file in chunks
+        # Save the file in chunks (Fixes Seek/Size errors)
         logger.info(f"Saving uploaded file to {file_path}")
         with open(file_path, "wb") as buffer:
             while chunk := await file.read(1024 * 1024):
                 buffer.write(chunk)
         
-        # Check size of the *saved file*
+        # Check size
         file_size = file_path.stat().st_size
         if file_size > settings.MAX_FILE_SIZE:
             logger.error(f"File too large: {file_size}")
             raise HTTPException(status_code=413, detail="File is too large.")
-        # --- END OF FIX ---
 
     except Exception as e:
         logger.error(f"Failed to save file: {e}")
@@ -129,7 +144,7 @@ async def predict_disease(
              logger.error(f"Classification failed: {raw_result.get('error')}")
              raise HTTPException(status_code=500, detail=raw_result.get("error", "Classification failed"))
 
-        # Step 2: Filter the predictions
+        # Step 2: Filter the predictions based on Crop Type
         logger.info(f"Original top guess: {raw_result['disease']} ({raw_result['confidence']})")
         logger.info(f"Filtering results by crop: '{crop_type}'")
         
@@ -138,21 +153,36 @@ async def predict_disease(
             crop_type
         )
         
-        # Step 3: Get the new, correct top prediction
+        # Step 3: Determine final disease
         new_top_prediction = get_new_top_prediction(filtered_predictions)
-        
         final_disease = new_top_prediction["disease"]
         final_confidence = new_top_prediction["confidence"]
         
         logger.success(f"Filtered top guess: {final_disease} ({final_confidence})")
         
-        # Step 4: Get treatment
+        # Step 4: Get info from Knowledge Base
         treatment = get_treatment_for_disease(final_disease)
+        prevention = get_prevention_for_disease(final_disease)
+        
+        # Step 5: ✅ TRANSLATION LOGIC
+        if language != "en":
+            logger.info(f"Translating response to: {language}")
+            
+            # Translate Treatment
+            if treatment:
+                treatment = [translate_response(t, language) for t in treatment]
+            
+            # Translate Prevention
+            if prevention:
+                prevention = [translate_response(p, language) for p in prevention]
                 
+        # Construct Final Response
         return {
             "disease": final_disease,
             "confidence": final_confidence,
             "treatment": treatment,
+            "prevention": prevention,
+            "language": language,
             "all_predictions": raw_result["all_predictions"],
             "filtered_predictions": filtered_predictions,
             "success": True
@@ -167,6 +197,188 @@ async def predict_disease(
         if file_path.exists():
             file_path.unlink()
             logger.info(f"Cleaned up temp file: {file_path}")
+
+@router.get("/languages")
+async def get_languages():
+    """Get list of supported languages for translation"""
+    return {
+        "supported_languages": get_supported_languages(),
+        "default": "en"
+    }
+
+
+
+
+
+# #!/usr/bin/env python3
+# """
+# API Router for Disease Prediction
+# FINAL - Fixes URL prefix and seek() error.
+# """
+
+# from fastapi import APIRouter, File, UploadFile, HTTPException, Form
+# from pathlib import Path
+# import shutil
+# import json
+# import sys
+# from typing import Dict, Any
+
+# # Go up from 'routers' to 'app', then import from 'ml' and 'config'
+# from ..ml.disease_classifier import classify_disease
+# from ..config import get_settings
+# from ..models.schemas import PredictionResponse 
+# from ..utils.logger import Logger 
+
+# router = APIRouter(tags=["disease"]) # <-- 1. FIX: Removed prefix="/api/disease"
+# settings = get_settings()
+# logger = Logger(__name__) # Initialize logger
+
+# # --- Load Knowledge Base ONCE when the app starts ---
+# knowledge_base = {}
+# try:
+#     kb_path = (Path(__file__).parent /diseases.json "../../../ml/knowledge_base/").resolve()
+#     if kb_path.exists():
+#         with open(kb_path, encoding='utf-8') as f:
+#             knowledge_base = json.load(f)
+#         logger.success(f"✅ Knowledge base loaded with {len(knowledge_base)} diseases.")
+#     else:
+#         logger.warning(f"❌ WARNING: Knowledge base file not found at {kb_path}")
+# except Exception as e:
+#     logger.error(f"❌ CRITICAL ERROR: Failed to load knowledge base: {e}")
+# # --- End of KB Load ---
+
+
+# def get_treatment_for_disease(disease_name: str):
+#     """Helper function to get treatment from the loaded knowledge base"""
+#     if disease_name in knowledge_base:
+#         treatment = knowledge_base[disease_name].get("treatment", ["USE_API_FALLBACK"])
+#         if "USE_API_FALLBACK" in treatment:
+#             logger.info(f"API Fallback: No local data for {disease_name}, calling LLM...")
+#             return [f"AI Fallback: Treatment for {disease_name} would be generated here."]
+#         return treatment
+#     return ["Knowledge base entry not found."]
+
+# def filter_predictions_by_crop(predictions: Dict[str, float], crop_type: str) -> Dict[str, float]:
+#     """Filters the model's predictions to only match the user's selected crop."""
+#     if crop_type == "Unknown":
+#         return predictions 
+
+#     filter_key = ""
+#     if crop_type.lower() == "potato":
+#         filter_key = "Potato___"
+#     elif crop_type.lower() == "tomato":
+#         filter_key = "Tomato___"
+#     elif crop_type.lower() == "apple":
+#         filter_key = "Apple___"
+#     elif crop_type.lower() == "grape":
+#         filter_key = "Grape___"
+#     elif crop_type.lower() == "corn":
+#         filter_key = "Corn_(maize)___"
+#     elif crop_type.lower() == "cassava":
+#         filter_key = "Cassava"
+#     elif crop_type.lower() == "paddy":
+#         paddy_diseases = ["bacterial_leaf_blight", "bacterial_leaf_streak", "bacterial_panicle_blight", "blast", "brown_spot", "dead_heart", "downy_mildew", "hispa", "normal", "tungro"]
+#         filtered = {disease: prob for disease, prob in predictions.items() if disease in paddy_diseases}
+#         return filtered if filtered else predictions
+
+#     if not filter_key:
+#         return predictions
+
+#     filtered_predictions = {disease: prob for disease, prob in predictions.items() if disease.startswith(filter_key)}
+#     return filtered_predictions if filtered_predictions else predictions
+
+# def get_new_top_prediction(filtered_predictions: Dict[str, float]) -> Dict[str, Any]:
+#     """Finds the new highest-confidence prediction from the filtered list"""
+#     if not filtered_predictions:
+#         return {"disease": "Uncertain", "confidence": 0.0}
+#     top_disease = max(filtered_predictions, key=filtered_predictions.get)
+#     top_confidence = filtered_predictions[top_disease]
+#     return {"disease": top_disease, "confidence": top_confidence}
+
+# @router.post("/predict", response_model=PredictionResponse) # <-- This path is now correct: /api/disease/predict
+# async def predict_disease(
+#     file: UploadFile = File(...),
+#     crop_type: str = Form("Unknown")
+# ):
+#     """
+#     Upload image and get a CROP-FILTERED disease prediction
+#     """
+    
+#     # Validate file type
+#     if file.content_type not in ["image/jpeg", "image/png"]:
+#         logger.error(f"Invalid file type: {file.content_type}")
+#         raise HTTPException(status_code=400, detail="Only JPG/PNG files allowed")
+
+#     upload_dir = Path(settings.UPLOAD_DIR)
+#     upload_dir.mkdir(exist_ok=True)
+#     file_path = upload_dir / f"temp_{file.filename}"
+        
+#     try:
+#         # --- 2. THIS IS THE FIX for seek() and NameError: 'offset' ---
+#         # Save the file in chunks
+#         logger.info(f"Saving uploaded file to {file_path}")
+#         with open(file_path, "wb") as buffer:
+#             while chunk := await file.read(1024 * 1024):
+#                 buffer.write(chunk)
+        
+#         # Check size of the *saved file*
+#         file_size = file_path.stat().st_size
+#         if file_size > settings.MAX_FILE_SIZE:
+#             logger.error(f"File too large: {file_size}")
+#             raise HTTPException(status_code=413, detail="File is too large.")
+#         # --- END OF FIX ---
+
+#     except Exception as e:
+#         logger.error(f"Failed to save file: {e}")
+#         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+        
+#     try:
+#         # Step 1: Get the model's raw prediction
+#         logger.info(f"Classifying image: {file_path}")
+#         raw_result = classify_disease(str(file_path))
+        
+#         if not raw_result.get("success", False):
+#              logger.error(f"Classification failed: {raw_result.get('error')}")
+#              raise HTTPException(status_code=500, detail=raw_result.get("error", "Classification failed"))
+
+#         # Step 2: Filter the predictions
+#         logger.info(f"Original top guess: {raw_result['disease']} ({raw_result['confidence']})")
+#         logger.info(f"Filtering results by crop: '{crop_type}'")
+        
+#         filtered_predictions = filter_predictions_by_crop(
+#             raw_result["all_predictions"], 
+#             crop_type
+#         )
+        
+#         # Step 3: Get the new, correct top prediction
+#         new_top_prediction = get_new_top_prediction(filtered_predictions)
+        
+#         final_disease = new_top_prediction["disease"]
+#         final_confidence = new_top_prediction["confidence"]
+        
+#         logger.success(f"Filtered top guess: {final_disease} ({final_confidence})")
+        
+#         # Step 4: Get treatment
+#         treatment = get_treatment_for_disease(final_disease)
+                
+#         return {
+#             "disease": final_disease,
+#             "confidence": final_confidence,
+#             "treatment": treatment,
+#             "all_predictions": raw_result["all_predictions"],
+#             "filtered_predictions": filtered_predictions,
+#             "success": True
+#         }
+        
+#     except Exception as e:
+#         logger.error(f"Error in prediction logic: {e}")
+#         raise HTTPException(status_code=500, detail=f"Classification logic failed: {str(e)}")
+        
+#     finally:
+#         # Clean up the uploaded file
+#         if file_path.exists():
+#             file_path.unlink()
+#             logger.info(f"Cleaned up temp file: {file_path}")
 
 
 
