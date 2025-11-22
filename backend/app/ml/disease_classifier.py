@@ -168,8 +168,8 @@ class DiseaseClassifier:
                 Path(__file__).parent.parent.parent.parent / settings.KB_PATH,
                 Path(__file__).parent.parent.parent.parent / "ml/knowledge_base/diseases.json",
                 Path("./ml/knowledge_base/diseases.json"),
-                # Path("../ml/knowledge_base/diseases.json"),
-                Path("../../ml/knowledge_base/diseases.json")     # Backup fallback
+                Path("../ml/knowledge_base/diseases.json"),
+               # Path("../../ml/knowledge_base/diseases.json")     # Backup fallback
             ]
             
             kb_path = None

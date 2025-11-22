@@ -1,665 +1,803 @@
 {
-  "Apple___Apple_scab": {
-    "description": "Disease class: Apple___Apple_scab",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 8820
-  },
-  "Apple___Black_rot": {
-    "description": "Disease class: Apple___Black_rot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 8694
-  },
-  "Apple___Cedar_apple_rust": {
-    "description": "Disease class: Apple___Cedar_apple_rust",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6050
-  },
-  "Apple___healthy": {
-    "description": "Disease class: Apple___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 14890
-  },
-  "Cassava CB (Cassava Blight)": {
-    "description": "Disease class: Cassava CB (Cassava Blight)",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 98
-  },
-  "Cassava CM (Cassava Mosaic)": {
-    "description": "Disease class: Cassava CM (Cassava Mosaic)",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 176
-  },
-  "Cassava Healthy leaf": {
-    "description": "Disease class: Cassava Healthy leaf",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 182
-  },
-  "bacterial_leaf_blight": {
-    "description": "Disease class: bacterial_leaf_blight",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 958
-  },
-  "bacterial_leaf_streak": {
-    "description": "Disease class: bacterial_leaf_streak",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 760
-  },
-  "bacterial_panicle_blight": {
-    "description": "Disease class: bacterial_panicle_blight",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 674
-  },
-  "blast": {
-    "description": "Disease class: blast",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 3476
-  },
-  "brown_spot": {
-    "description": "Disease class: brown_spot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 1930
-  },
-  "dead_heart": {
-    "description": "Disease class: dead_heart",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 2884
-  },
-  "downy_mildew": {
-    "description": "Disease class: downy_mildew",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 1240
-  },
-  "hispa": {
-    "description": "Disease class: hispa",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 3188
-  },
-  "normal": {
-    "description": "Disease class: normal",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 3528
-  },
-  "tungro": {
-    "description": "Disease class: tungro",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 2176
-  },
-  "Blueberry___healthy": {
-    "description": "Disease class: Blueberry___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 9012
-  },
-  "Cherry_(including_sour)___healthy": {
-    "description": "Disease class: Cherry_(including_sour)___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 5124
-  },
-  "Cherry_(including_sour)___Powdery_mildew": {
-    "description": "Disease class: Cherry_(including_sour)___Powdery_mildew",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6312
-  },
-  "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
-    "description": "Disease class: Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 3078
-  },
-  "Corn_(maize)___Common_rust_": {
-    "description": "Disease class: Corn_(maize)___Common_rust_",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 7152
-  },
-  "Corn_(maize)___healthy": {
-    "description": "Disease class: Corn_(maize)___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6972
-  },
-  "Corn_(maize)___Northern_Leaf_Blight": {
-    "description": "Disease class: Corn_(maize)___Northern_Leaf_Blight",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 5910
-  },
-  "Grape___Black_rot": {
-    "description": "Disease class: Grape___Black_rot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 7080
-  },
-  "Grape___Esca_(Black_Measles)": {
-    "description": "Disease class: Grape___Esca_(Black_Measles)",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 8300
-  },
-  "Grape___healthy": {
-    "description": "Disease class: Grape___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 2538
-  },
-  "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
-    "description": "Disease class: Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6456
-  },
-  "Orange___Haunglongbing_(Citrus_greening)": {
-    "description": "Disease class: Orange___Haunglongbing_(Citrus_greening)",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 33042
-  },
-  "Peach___Bacterial_spot": {
-    "description": "Disease class: Peach___Bacterial_spot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 13782
-  },
-  "Peach___healthy": {
-    "description": "Disease class: Peach___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 2160
-  },
-  "Pepper,_bell___Bacterial_spot": {
-    "description": "Disease class: Pepper,_bell___Bacterial_spot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 5982
-  },
-  "Pepper,_bell___healthy": {
-    "description": "Disease class: Pepper,_bell___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 8868
-  },
-  "Potato___Early_blight": {
-    "description": "Disease class: Potato___Early_blight",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6000
-  },
-  "Potato___healthy": {
-    "description": "Disease class: Potato___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 912
-  },
-  "Potato___Late_blight": {
-    "description": "Disease class: Potato___Late_blight",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6000
-  },
-  "Raspberry___healthy": {
-    "description": "Disease class: Raspberry___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 2226
-  },
-  "Soybean___healthy": {
-    "description": "Disease class: Soybean___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 30540
-  },
-  "Squash___Powdery_mildew": {
-    "description": "Disease class: Squash___Powdery_mildew",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 11010
-  },
-  "Strawberry___healthy": {
-    "description": "Disease class: Strawberry___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 2736
-  },
-  "Strawberry___Leaf_scorch": {
-    "description": "Disease class: Strawberry___Leaf_scorch",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6654
-  },
-  "Tomato___Bacterial_spot": {
-    "description": "Disease class: Tomato___Bacterial_spot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 12762
-  },
-  "Tomato___Early_blight": {
-    "description": "Disease class: Tomato___Early_blight",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 6000
-  },
-  "Tomato___healthy": {
-    "description": "Disease class: Tomato___healthy",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 9546
-  },
-  "Tomato___Late_blight": {
-    "description": "Disease class: Tomato___Late_blight",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 11454
-  },
-  "Tomato___Leaf_Mold": {
-    "description": "Disease class: Tomato___Leaf_Mold",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 5712
-  },
-  "Tomato___Septoria_leaf_spot": {
-    "description": "Disease class: Tomato___Septoria_leaf_spot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 10626
-  },
-  "Tomato___Spider_mites Two-spotted_spider_mite": {
-    "description": "Disease class: Tomato___Spider_mites Two-spotted_spider_mite",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 10056
-  },
-  "Tomato___Target_Spot": {
-    "description": "Disease class: Tomato___Target_Spot",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 8424
-  },
-  "Tomato___Tomato_mosaic_virus": {
-    "description": "Disease class: Tomato___Tomato_mosaic_virus",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 2238
-  },
-  "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
-    "description": "Disease class: Tomato___Tomato_Yellow_Leaf_Curl_Virus",
-    "symptoms": [
-      "USE_API_FALLBACK"
-    ],
-    "treatment": [
-      "USE_API_FALLBACK"
-    ],
-    "prevention": [
-      "USE_API_FALLBACK"
-    ],
-    "image_count": 32142
-  }
+    "Apple___Apple_scab": {
+        "description": "Apple scab is a fungal disease that causes dark, scabby lesions on apple leaves and fruit.",
+        "symptoms": [
+            "Dark, scabby lesions on leaves and fruit",
+            "Premature leaf drop"
+        ],
+        "treatment": [
+            "Apply fungicides containing captan or mancozeb",
+            "Use organic fungicides like copper spray or neem oil"
+        ],
+        "prevention": [
+            "Plant resistant apple varieties",
+            "Keep the area around apple trees clean and free of fallen leaves and fruit"
+        ]
+    },
+    "Apple___Black_rot": {
+        "description": "Black rot is a serious fungal disease in apple trees that causes dark, sunken lesions on fruit, leaves and bark.",
+        "symptoms": [
+            "Dark, sunken lesions on fruit, leaves and bark",
+            "Yellowing and wilting of leaves",
+            "Fruit mummification"
+        ],
+        "treatment": [
+            "Application of fungicides like mancozeb or captan",
+            "Removal and destruction of infected plant parts"
+        ],
+        "prevention": [
+            "Regular pruning to improve air circulation",
+            "Planting disease-resistant apple varieties"
+        ]
+    },
+    "Apple___Cedar_apple_rust": {
+        "description": "Cedar apple rust is a fungal disease that affects apples, causing yellow spots and galls on leaves, fruit, and twigs.",
+        "symptoms": [
+            "Bright orange-yellow spots on leaves and fruit",
+            "Galls or horn-like structures on twigs and branches"
+        ],
+        "treatment": [
+            "Apply fungicides that contain myclobutanil or propiconazole",
+            "Pruning and burning infected branches"
+        ],
+        "prevention": [
+            "Regular inspections and removal of nearby cedar trees",
+            "Planting rust-resistant apple varieties"
+        ]
+    },
+    "Apple___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Cassava CB (Cassava Blight)": {
+        "description": "Cassava CB is a fungal disease that causes wilting and yellowing of leaves in cassava plants.",
+        "symptoms": [
+            "Wilting of leaves",
+            "Yellowing of leaves"
+        ],
+        "treatment": [
+            "Apply fungicides containing copper sulfate",
+            "Use organic fungicides like neem oil"
+        ],
+        "prevention": [
+            "Plant disease-resistant cassava varieties",
+            "Practice crop rotation to reduce disease buildup in soil"
+        ]
+    },
+    "Cassava CM (Cassava Mosaic)": {
+        "description": "Cassava Mosaic is a viral disease causing reduced yield and quality in Cassava plants.",
+        "symptoms": [
+            "Distorted leaf shape",
+            "Mosaic pattern on leaves"
+        ],
+        "treatment": [
+            "Use of antiviral chemicals like Oxymatrine",
+            "Removal and destruction of infected plants"
+        ],
+        "prevention": [
+            "Planting disease-free cuttings",
+            "Regular field inspection and removal of infected plants"
+        ]
+    },
+    "Cassava Healthy leaf": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "bacterial_leaf_blight": {
+        "description": "Bacterial leaf blight is a plant disease caused by bacteria that results in yellowing and wilting of leaves.",
+        "symptoms": [
+            "Yellowing of leaves",
+            "Wilting or drooping of leaves",
+            "Brown spots or blight on leaves"
+        ],
+        "treatment": [
+            "Use of copper-based fungicides",
+            "Application of organic bactericides like Serenade"
+        ],
+        "prevention": [
+            "Regular inspection and removal of infected plants",
+            "Proper irrigation to avoid waterlogging",
+            "Crop rotation to reduce bacteria in soil"
+        ]
+    },
+    "bacterial_leaf_streak": {
+        "description": "Bacterial leaf streak is a disease caused by bacteria that results in brown or yellow streaks on plant leaves.",
+        "symptoms": [
+            "Brown or yellow leaf streaks",
+            "Water-soaked spots on leaves that dry and turn brown"
+        ],
+        "treatment": [
+            "Use copper-based bactericides",
+            "Application of organic bactericides like Serenade"
+        ],
+        "prevention": [
+            "Regularly inspect plants for early signs of disease",
+            "Avoid overhead watering to prevent moisture build-up which encourages bacterial growth"
+        ]
+    },
+    "bacterial_panicle_blight": {
+        "description": "Bacterial panicle blight is a rice disease caused by the bacterium Burkholderia glumae that affects the panicle, leading to grain sterility and crop loss.",
+        "symptoms": [
+            "Yellowing and wilting of panicles",
+            "Brown discoloration of glumes and grains",
+            "Premature grain death",
+            "Grain sterility"
+        ],
+        "treatment": [
+            "Use of copper-based fungicides",
+            "Application of antibiotics like Streptomycin"
+        ],
+        "prevention": [
+            "Plant resistant rice varieties",
+            "Avoid overhead irrigation during flowering",
+            "Maintain field sanitation by removing infected plants",
+            "Monitor fields regularly for early detection"
+        ]
+    },
+    "blast": {
+        "description": "Blast is a plant disease caused by the fungus Magnaporthe oryzae, primarily affecting crops like rice, wheat, and barley.",
+        "symptoms": [
+            "Light gray to white lesions on leaves",
+            "Rotting and wilting of plant"
+        ],
+        "treatment": [
+            "Use fungicides such as Tricyclazole and Isoprothiolane",
+            "Apply organic biocontrol agents like Trichoderma"
+        ],
+        "prevention": [
+            "Plant disease-resistant varieties",
+            "Maintain proper field sanitation and avoid excessive nitrogen fertilization"
+        ]
+    },
+    "brown_spot": {
+        "description": "Brown spot is a fungal disease causing brown or tan lesions on leaves and stems.",
+        "symptoms": [
+            "Brown or tan spots on leaves",
+            "Reduced yield and plant vigour"
+        ],
+        "treatment": [
+            "Use of fungicides such as Trifloxystrobin",
+            "Applying organic fungicides like copper sprays"
+        ],
+        "prevention": [
+            "Regular crop rotation",
+            "Avoiding overwatering and ensuring good soil drainage"
+        ]
+    },
+    "dead_heart": {
+        "description": "Dead heart is a plant disease usually affecting rice, causing the central leaf whorl to wither and die.",
+        "symptoms": [
+            "Central leaf whorl withering",
+            "Dieback beginning from the plant's heart",
+            "Yellowing of leaves"
+        ],
+        "treatment": [
+            "Use of appropriate insecticides like fipronil and imidacloprid",
+            "Introducing natural predators of the disease-causing pests"
+        ],
+        "prevention": [
+            "Regular field monitoring and early pest detection",
+            "Rotational planting to disrupt pest lifecycle"
+        ]
+    },
+    "downy_mildew": {
+        "description": "Downy mildew is a fungal disease that causes yellowing leaves, stunted growth, and a fluffy white or gray mold on the undersides of leaves.",
+        "symptoms": [
+            "Yellow or light green spots on top of leaves",
+            "White or gray mold on the underside of leaves"
+        ],
+        "treatment": [
+            "Apply fungicides like metalaxyl and mefenoxam",
+            "Organic treatments include sprays containing copper or sulfur"
+        ],
+        "prevention": [
+            "Plant resistant varieties if available",
+            "Ensure good air circulation around plants to reduce humidity"
+        ]
+    },
+    "hispa": {
+        "description": "Hispa is a pest that attacks rice plants, causing severe damage to the leaves and overall crop yield.",
+        "symptoms": [
+            "White or yellow spots on the leaves",
+            "Leaves getting curled or dried"
+        ],
+        "treatment": [
+            "Apply an appropriate insecticide such as Chlorpyrifos or Cartap hydrochloride",
+            "Use of bio-pesticides like Beauveria bassiana or Metarhizium anisopliae"
+        ],
+        "prevention": [
+            "Regularly monitor the field for early signs of hispa",
+            "Use pest-resistant varieties of rice"
+        ]
+    },
+    "normal": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "tungro": {
+        "description": "Tungro is a viral disease often seen in rice crops, causing yellowing and stunted growth.",
+        "symptoms": [
+            "Yellow discoloration of leaves",
+            "Stunted plant growth"
+        ],
+        "treatment": [
+            "Use of disease-resistant varieties of rice",
+            "Application of organic fungicides"
+        ],
+        "prevention": [
+            "Regular monitoring and early detection of infected plants",
+            "Use of clean and certified seeds"
+        ]
+    },
+    "Blueberry___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Cherry_(including_sour)___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Cherry_(including_sour)___Powdery_mildew": {
+        "description": "Powdery mildew is a fungal disease that affects the leaves of cherry trees, causing a white powdery growth.",
+        "symptoms": [
+            "White, powdery spots on leaves and stems",
+            "Leaves turn yellow and dry out",
+            "Severe infection can lead to premature leaf drop"
+        ],
+        "treatment": [
+            "Use fungicides containing sulfur, potassium bicarbonate or neem oil",
+            "Apply a homemade spray of baking soda, water, and dish soap"
+        ],
+        "prevention": [
+            "Ensure proper spacing between plants for good air circulation",
+            "Avoid overhead watering to keep leaves dry",
+            "Regularly prune to remove infected parts"
+        ]
+    },
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+        "description": "Gray leaf spot is a fungal disease in corn that causes grayish tan lesions on the leaves.",
+        "symptoms": [
+            "Grayish tan lesions on leaves",
+            "Premature leaf death",
+            "Highly susceptible under humid conditions"
+        ],
+        "treatment": [
+            "Use of fungicides like triazoles and strobilurins",
+            "Crop rotation with non-host plants"
+        ],
+        "prevention": [
+            "Regular field monitoring for early detection",
+            "Planting resistant corn varieties"
+        ]
+    },
+    "Corn_(maize)___Common_rust_": {
+        "description": "Common rust is a widespread fungal disease that affects corn, causing reddish-brown pustules on the leaves.",
+        "symptoms": [
+            "Small, round, cinnamon-brown pustules on leaves",
+            "Yellowing and wilting of the plant"
+        ],
+        "treatment": [
+            "Use of fungicides such as Propiconazole or Azoxystrobin",
+            "Plant resistant varieties or apply organic fungicides"
+        ],
+        "prevention": [
+            "Practice crop rotation to break the disease cycle",
+            "Remove and destroy infected plants to prevent spread"
+        ]
+    },
+    "Corn_(maize)___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Corn_(maize)___Northern_Leaf_Blight": {
+        "description": "Northern Leaf Blight is a fungal disease that causes long, grayish lesions on the corn leaves, significantly reducing yield.",
+        "symptoms": [
+            "Long, elliptical, grey-green lesions on leaves",
+            "Lesions turn tan or gray as the disease progresses",
+            "Severe leaf blighting",
+            "Reduced ear size"
+        ],
+        "treatment": [
+            "Application of fungicides such as Propiconazole or Pyraclostrobin",
+            "Use of organic biocontrol agents like Trichoderma"
+        ],
+        "prevention": [
+            "Planting resistant corn varieties",
+            "Crop rotation with non-host crops",
+            "Timely removal and destruction of infected plant debris",
+            "Maintain optimal plant density to promote air circulation"
+        ]
+    },
+    "Grape___Black_rot": {
+        "description": "Black rot is a fungal disease affecting grapes, caused by Guignardia bidwellii.",
+        "symptoms": [
+            "Dark, reddish-brown spots on leaves and fruit",
+            "Blighted young shoots, tendrils, and leaf petioles"
+        ],
+        "treatment": [
+            "Use of fungicides like Mancozeb and Ziram",
+            "Pruning and destroying infected parts"
+        ],
+        "prevention": [
+            "Regular inspection and early detection",
+            "Proper pruning to promote air circulation"
+        ]
+    },
+    "Grape___Esca_(Black_Measles)": {
+        "description": "Esca, also known as Black Measles, is a serious fungal disease of grapevines that can cause leaf discoloration, fruit rot, and vine death.",
+        "symptoms": [
+            "Leaf discoloration or 'tiger stripes'",
+            "Decay or black spots on the fruit",
+            "Dying or dead vines"
+        ],
+        "treatment": [
+            "Remove and destroy affected vines",
+            "Apply systemic fungicides"
+        ],
+        "prevention": [
+            "Plant resistant grape varieties",
+            "Regularly prune and monitor vines for early detection of symptoms",
+            "Maintain proper spacing between vines for adequate air circulation"
+        ]
+    },
+    "Grape___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+        "description": "Grape Leaf Blight is a fungal disease that causes significant damage to grape leaves, reducing their ability to photosynthesize.",
+        "symptoms": [
+            "Brown or black spots on leaves",
+            "Yellowing and wilting of leaves",
+            "Premature leaf drop"
+        ],
+        "treatment": [
+            "Use of fungicides like mancozeb or chlorothalonil",
+            "Pruning and destruction of infected plant parts"
+        ],
+        "prevention": [
+            "Regular monitoring and early detection",
+            "Maintain good air circulation to prevent damp conditions"
+        ]
+    },
+    "Orange___Haunglongbing_(Citrus_greening)": {
+        "description": "Huanglongbing, also known as citrus greening, is a serious bacterial disease that affects the vascular system of citrus trees, leading to premature fruit drop and death of the tree.",
+        "symptoms": [
+            "Yellowing and blotchy mottle appearing on the leaves",
+            "Fruits are small and have a bitter taste",
+            "Branch dieback and eventually the entire tree wilts"
+        ],
+        "treatment": [
+            "Application of systemic insecticides like imidacloprid to control the vector, Asian citrus psyllid",
+            "Antibiotic treatment using products like streptomycin or oxytetracycline"
+        ],
+        "prevention": [
+            "Regular inspection and removal of infected trees to limit disease spread",
+            "Use of disease-free nursery plants for new plantings"
+        ]
+    },
+    "Peach___Bacterial_spot": {
+        "description": "Peach Bacterial Spot is a bacterial disease that causes blemishes on peaches and other stone fruits.",
+        "symptoms": [
+            "Dark, water-soaked spots on leaves",
+            "Fruit with dark spots or pits"
+        ],
+        "treatment": [
+            "Apply copper-based fungicides",
+            "Prune and destroy infected branches"
+        ],
+        "prevention": [
+            "Regularly inspect trees for early signs of disease",
+            "Plant disease-resistant varieties"
+        ]
+    },
+    "Peach___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Pepper,_bell___Bacterial_spot": {
+        "description": "Bacterial spot on bell pepper is a disease caused by bacteria that results in leaf and fruit spots and yield reduction.",
+        "symptoms": [
+            "Dark spots on leaves, stems, and fruits",
+            "Wilting and dropping of leaves"
+        ],
+        "treatment": [
+            "Use of copper-based fungicides",
+            "Application of biological control agents like Bacillus subtilis"
+        ],
+        "prevention": [
+            "Plant disease-resistant varieties",
+            "Ensure proper crop rotation and field sanitation"
+        ]
+    },
+    "Pepper,_bell___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Potato___Early_blight": {
+        "description": "Early blight is a common fungal disease in potatoes caused by the pathogen Alternaria solani, causing leaf spots, and if severe, can lead to significant yield loss.",
+        "symptoms": [
+            "Small, dark spots on leaves",
+            "Brown or black lesions on tubers",
+            "Yellowing and premature dropping of leaves",
+            "Reduced yield and size of potatoes"
+        ],
+        "treatment": [
+            "Use fungicides like chlorothalonil or mancozeb",
+            "Remove and destroy infected plants to reduce the spread"
+        ],
+        "prevention": [
+            "Rotate crops regularly to prevent build-up of the disease",
+            "Avoid overhead watering to keep foliage dry",
+            "Plant disease-resistant potato varieties",
+            "Maintain good sanitation by removing plant debris at the end of the season"
+        ]
+    },
+    "Potato___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Potato___Late_blight": {
+        "description": "Late blight is a serious disease in potatoes caused by the fungus-like organism Phytophthora infestans.",
+        "symptoms": [
+            "Dark blotches on leaf tips and plant stems",
+            "White fungal growth under leaf during wet conditions",
+            "Brown or blackish rot on potatoes"
+        ],
+        "treatment": [
+            "Use of fungicides containing chlorothalonil or mancozeb",
+            "Application of copper-based organic fungicides"
+        ],
+        "prevention": [
+            "Planting resistant potato varieties",
+            "Proper crop rotation and field sanitation"
+        ]
+    },
+    "Raspberry___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Soybean___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Squash___Powdery_mildew": {
+        "description": "Squash Powdery Mildew is a common fungal disease that affects the foliage of squash plants, characterized by powdery white spores.",
+        "symptoms": [
+            "White, powdery spots on leaves and stems",
+            "Yellowing and drying of leaves"
+        ],
+        "treatment": [
+            "Use of fungicides such as triadimefon and myclobutanil",
+            "Organic remedies like neem oil, sulfur, and bicarbonates"
+        ],
+        "prevention": [
+            "Plant resistant varieties if available",
+            "Ensure adequate spacing between plants for airflow"
+        ]
+    },
+    "Strawberry___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Strawberry___Leaf_scorch": {
+        "description": "Strawberry leaf scorch is a fungal disease that causes red to purple spots on the upper surface of leaves and can lead to plant death.",
+        "symptoms": [
+            "Red to purple spots on leaves",
+            "Brown, dried leaves",
+            "Leaf drop",
+            "Reduced yield"
+        ],
+        "treatment": [
+            "Use of fungicides such as Propiconazole",
+            "Organic options include sprays containing copper or sulfur"
+        ],
+        "prevention": [
+            "Regular inspection of plants for signs of disease",
+            "Maintain good spacing between plants for air circulation",
+            "Remove and dispose infected leaves",
+            "Avoid overhead irrigation to minimize leaf wetness"
+        ]
+    },
+    "Tomato___Bacterial_spot": {
+        "description": "Bacterial spot is a common and damaging disease of tomatoes caused by bacteria.",
+        "symptoms": [
+            "Small, dark spots on leaves",
+            "Fruit lesions"
+        ],
+        "treatment": [
+            "Copper-based fungicides",
+            "Introduce beneficial insects that feed on the bacteria"
+        ],
+        "prevention": [
+            "Crop rotation",
+            "Use disease-free seeds and plants"
+        ]
+    },
+    "Tomato___Early_blight": {
+        "description": "Early blight is a common tomato disease caused by the fungus Alternaria solani that can affect the plant's leaves, stems and fruit.",
+        "symptoms": [
+            "Dark spots on older leaves",
+            "Yellowing and wilting of lower leaves",
+            "Brown spots on fruit"
+        ],
+        "treatment": [
+            "Use fungicides containing chlorothalonil or mancozeb",
+            "Apply organic copper sprays regularly"
+        ],
+        "prevention": [
+            "Plant disease-resistant varieties",
+            "Practice crop rotation",
+            "Maintain proper spacing between plants for good air circulation",
+            "Remove and properly dispose infected plants"
+        ]
+    },
+    "Tomato___healthy": {
+        "description": "The plant looks healthy and vigorous.",
+        "symptoms": [
+            "No signs of disease",
+            "Green leaves"
+        ],
+        "treatment": [
+            "Maintain regular watering",
+            "Monitor for pests"
+        ],
+        "prevention": [
+            "Good field hygiene",
+            "Proper spacing"
+        ]
+    },
+    "Tomato___Late_blight": {
+        "description": "Late blight is a destructive disease in tomatoes caused by the fungus-like organism Phytophthora infestans.",
+        "symptoms": [
+            "Irregularly shaped black or brown spots on leaves",
+            "Fruit rot with fluffy white fungal growth under humid conditions"
+        ],
+        "treatment": [
+            "Use specific fungicides like Metalaxyl or Dimethomorph",
+            "Apply organic treatments like copper-based sprays or biofungicides"
+        ],
+        "prevention": [
+            "Rotate crops regularly to disrupt the life cycle of the pathogen",
+            "Plant disease-resistant varieties of tomatoes"
+        ]
+    },
+    "Tomato___Leaf_Mold": {
+        "description": "Tomato leaf mold is a fungus disease caused by Passalora fulva that primarily affects the leaves of the tomato plant.",
+        "symptoms": [
+            "Pale green spots on the upper leaf surface",
+            "Velvety, purple to brown mold on the lower leaf surface"
+        ],
+        "treatment": [
+            "Use fungicides containing chlorothalonil or mancozeb",
+            "Apply organic treatments such as copper fungicides or baking soda sprays"
+        ],
+        "prevention": [
+            "Ensure proper plant spacing for good air circulation",
+            "Water plants at the base to avoid wetting the leaves"
+        ]
+    },
+    "Tomato___Septoria_leaf_spot": {
+        "description": "Septoria leaf spot is a common fungal disease in tomatoes that causes brown or grey spots on leaves.",
+        "symptoms": [
+            "Brown/grey spots on leaves with a white or grey center",
+            "Yellowing and wilting of leaves"
+        ],
+        "treatment": [
+            "Use a specific fungicide like Chlorothalonil or Copper-based fungicides",
+            "Organic treatments include sprays with bicarbonate or copper soap"
+        ],
+        "prevention": [
+            "Ensure sufficient space between plants for good air circulation",
+            "Avoid water splashing as it spreads the disease, water the base of the plant instead"
+        ]
+    },
+    "Tomato___Spider_mites Two-spotted_spider_mite": {
+        "description": "Two-spotted spider mite is a common pest that affects tomato plants, causing damage by sucking sap from the underside of leaves.",
+        "symptoms": [
+            "Visible tiny mites, eggs, or webs on the underside of leaves",
+            "Yellow or white speckles on leaves"
+        ],
+        "treatment": [
+            "Use a miticide specifically designed for spider mites",
+            "Introduce natural predators like ladybugs or lacewings"
+        ],
+        "prevention": [
+            "Regularly check the underside of leaves for signs of infestation",
+            "Maintain lower temperatures and higher humidity as mites prefer hot, dry conditions"
+        ]
+    },
+    "Tomato___Target_Spot": {
+        "description": "Tomato Target Spot is a fungal disease causing spots on leaves, stems and fruits of tomatoes.",
+        "symptoms": [
+            "Dark, concentric-ringed spots on leaves",
+            "Rotting and spots on fruits"
+        ],
+        "treatment": [
+            "Apply fungicides like chlorothalonil or mancozeb",
+            "Use organic fungicides like copper-based sprays"
+        ],
+        "prevention": [
+            "Practice crop rotation to reduce disease build-up",
+            "Avoid overhead irrigation to keep foliage dry"
+        ]
+    },
+    "Tomato___Tomato_mosaic_virus": {
+        "description": "Tomato mosaic virus is a disease that causes mottled yellowing of the leaves, stunted growth, and reduced yield in tomato plants.",
+        "symptoms": [
+            "Mottled yellow and green leaves",
+            "Stunted growth and reduced yield",
+            "Deformed or discolored fruits"
+        ],
+        "treatment": [
+            "Use of specific antiviral chemicals like Virucides",
+            "Removal and destruction of infected plants to prevent spread"
+        ],
+        "prevention": [
+            "Regular disinfection of tools and equipment",
+            "Planting virus-resistant tomato varieties"
+        ]
+    },
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+        "description": "Tomato Yellow Leaf Curl Virus is a disease that causes yellowing and curling of tomato leaves, leading to stunted growth and reduced yield.",
+        "symptoms": [
+            "Yellowing and upward curling of leaves",
+            "Plant stunting",
+            "Flower drop",
+            "Reduced fruit yield"
+        ],
+        "treatment": [
+            "Application of Imidacloprid or Acetamiprid insecticides",
+            "Use of neem oil or insecticidal soap"
+        ],
+        "prevention": [
+            "Plant virus-resistant tomato varieties",
+            "Control whitefly population as they spread the virus",
+            "Regularly monitor plants for early detection of the disease",
+            "Remove and destroy infected plants immediately"
+        ]
+    }
 }
