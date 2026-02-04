@@ -6,12 +6,21 @@ FIXED: Safe dict access + better error handling
 
 from pathlib import Path
 from ..utils.logger import Logger
-from .disease_classifier import classify_disease
+from .dual_classifier import dual_bot
 from .llm_provider import query_llm
 
 logger = Logger(__name__)
 
-def process_chat_with_image(image_path: str, user_message: str):
+def classify_disease_wrapper(image_path: str):
+    """Wrapper for disease classification using dual_classifier"""
+    res = dual_bot.predict(image_path)
+    return res
+
+def process_chat_with_image(
+    image_path: str,
+    user_message: str,
+    system_instruction: str = None
+):
     """
     Process image + user message with disease context
     
@@ -30,7 +39,7 @@ def process_chat_with_image(image_path: str, user_message: str):
     try:
         # Step 1: Classify disease from image
         logger.info(f"Classifying disease from image...")
-        disease_result = classify_disease(image_path)
+        disease_result = classify_disease_wrapper(image_path)
         
         if not disease_result.get("success"):
             logger.error("Disease classification failed")
@@ -69,6 +78,8 @@ ALTERNATIVE POSSIBILITIES:
 
 Farmer's Question: {user_message}
 
+IMPORTANT: Return ONLY JSON, no conversational filler.
+
 Please provide:
 1. CLEAR explanation of the disease
 2. EXACT treatment steps with timing
@@ -79,9 +90,24 @@ Keep language simple - farmer-friendly, not technical.
 Include local remedies if known.
 """
         
-        # Step 3: Query LLM with full context
+        # Step 3: Build messages (allow optional injected system instruction)
+        messages = []
+
+        if system_instruction:
+            messages.append({
+                "role": "system",
+                "content": system_instruction
+            })
+
+        messages.append({
+            "role": "user",
+            "content": user_message
+        })
+
+        # Step 4: Query LLM with full context
         logger.info(f"Querying LLM for response...")
-        llm_response = query_llm(user_message, system_prompt)
+        # If a caller provided a system_instruction, prefer it; else use the generated system_prompt
+        llm_response = query_llm(user_message, system_instruction if system_instruction else system_prompt)
         
         if not llm_response.get("success"):
             logger.error("LLM query failed")
@@ -143,6 +169,8 @@ def process_chat_without_image(user_message: str):
 You are an agricultural expert helping Indian farmers.
 
 The farmer is asking a general farming question (no image provided).
+
+IMPORTANT: Return ONLY JSON, no conversational filler.
 
 Provide:
 1. Clear, practical advice

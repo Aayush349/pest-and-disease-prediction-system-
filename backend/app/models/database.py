@@ -30,6 +30,10 @@ class Prediction(Base):
     
     disease = Column(String(200), nullable=False)
     confidence = Column(Float, nullable=False)
+
+    ndvi_score = Column(Float, nullable=True) 
+    field_health = Column(String(100), nullable=True) # "High Stress", "Healthy"
+    combined_risk_score = Column(String(100), nullable=True)
     
     # 👇 COLUMNS FOR HEATMAP & RADAR 👇
     latitude = Column(Float, nullable=True)

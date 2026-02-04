@@ -12,7 +12,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from pathlib import Path
 from .routers import news  # <--- Import news
-from .routers import health, disease, chat, analytics, weather, tts, news # <--- 'news' add karo
+from .routers import health, disease, chat, analytics, weather, tts, news,voice  # <--- 'news' add karo
 from fastapi.staticfiles import StaticFiles # <--- Import
 from .routers import risk
 from .routers import nutrient_advisor
@@ -51,8 +51,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
@@ -139,13 +137,22 @@ app.include_router(tts.router, prefix="/api/tts", tags=["Text to Speech"])
 app.include_router(news.router, prefix="/api/news", tags=["News Ticker"])
 
 # ... baki routers ...
-app.include_router(news.router, prefix="/api/news", tags=["News Ticker"]) # <--- Ye line add karo
+# app.include_router(news.router, prefix="/api/news", tags=["News Ticker"]) # <--- Ye line add karo
+
+app.include_router(tts.router, prefix="/api/tts", tags=["Output: Speaker"]) 
+
+app.include_router(voice.router, prefix="/api/voice", tags=["Input: Microphone"]) # NEW
 
 app.include_router(risk.router, prefix="/api/risk", tags=["Risk Prediction"])
 
 app.include_router(nutrient_advisor.router, prefix="/api/nutrients", tags=["Weapon 6: NPK Advisor"])
 
 app.include_router(auth.router, prefix="/api", tags=["Auth & Security"])
+
+# ============== Static File Mounts ==============
+app.mount("/uploads/images", StaticFiles(directory="uploads/images"), name="images")
+app.mount("/uploads/pdfs", StaticFiles(directory="uploads/pdfs"), name="pdfs")
+app.mount("/uploads/audio", StaticFiles(directory="uploads/audio"), name="audio")
 
 # ============== Root Endpoint ==============
 @app.get("/")

@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Float, DateTime, Integer, Text, JSON
 from datetime import datetime
 import uuid
 from ..database import Base
+from sqlalchemy.sql import func
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -34,12 +35,22 @@ class Prediction(Base):
     # ✅ NEW FIELDS: Location for Heatmap
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
-    
+    # Additional fields for risk analysis and map visualization
+    ndvi_score = Column(Float, nullable=True)
+    field_health = Column(String(100), nullable=True)
+    combined_risk = Column(String(100), nullable=True)
+    description = Column(Text, nullable=True)
+    fallback_reason = Column(Text)
+    advisory_source = Column(String(100), nullable=True)
+    model_used = Column(String(100), nullable=True)
     top5 = Column(JSON, nullable=True)
     treatment = Column(JSON, nullable=True)
     prevention = Column(JSON, nullable=True)
     image_path = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    crop_stage = Column(String, nullable=True) # <--- Add this line
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    knowledge_source = Column(String, default="yolo")
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"

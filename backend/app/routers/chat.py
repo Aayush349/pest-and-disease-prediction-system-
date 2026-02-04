@@ -2,12 +2,15 @@
 Chat endpoints with disease context
 """
 
-from fastapi import APIRouter, File, UploadFile, HTTPException, Query
+from fastapi import APIRouter, File, UploadFile, HTTPException, Query, Depends
 from pydantic import BaseModel
 from pathlib import Path
 import shutil
 import uuid
+from sqlalchemy.orm import Session
 from ..config import get_settings
+from ..database import get_db
+from ..models.sql_models import Prediction
 from ..ml.chatbot_agent import process_chat_with_image, process_chat_without_image
 from ..utils.logger import Logger
 
@@ -19,9 +22,13 @@ class ChatRequest(BaseModel):
     """Chat request without image"""
     message: str
     farmer_id: str
+    language: str = "en"
 
 @router.post("/message")
-async def chat_message(request: ChatRequest):
+async def chat_message(
+    request: ChatRequest,
+    db: Session = Depends(get_db)
+):
     """
     Send text-only message to chatbot
     
@@ -39,8 +46,42 @@ async def chat_message(request: ChatRequest):
             raise HTTPException(status_code=400, detail="Message cannot be empty")
         
         logger.info(f"Processing chat from {request.farmer_id}")
-        
-        result = process_chat_without_image(request.message)
+
+        # ---------- FETCH LAST DISEASE SCAN (RAG) ----------
+        last_scan = (
+            db.query(Prediction)
+            .filter(Prediction.farmer_id == request.farmer_id)
+            .order_by(Prediction.created_at.desc())
+            .first()
+        )
+
+        context = ""
+        if last_scan:
+            context = f"""
+    LAST FIELD SCAN:
+    Disease: {last_scan.disease}
+    Confidence: {int(last_scan.confidence * 100)}%
+    Crop Stage: {last_scan.crop_stage}
+    """
+
+        system_prompt = f"""
+You are AgroGuard AI.
+
+STRICT RULES:
+1. ONLY answer agriculture related questions (crops, pests, soil, fertilizer, disease, NDVI).
+2. If user asks anything else, reply ONLY in English:
+"Please ask agricultural questions only. I am here to help with your crops."
+
+USER CONTEXT:
+{context}
+
+Language: {request.language}
+"""
+
+        result = process_chat_without_image(
+            request.message,
+            system_instruction=system_prompt
+        )
         
         if not result.get("success"):
             logger.error(f"Chat failed: {result.get('error')}")
@@ -96,7 +137,18 @@ async def chat_with_image(
             shutil.copyfileobj(file.file, buffer)
         
         # Process
-        result = process_chat_with_image(str(file_path), message)
+        # result = process_chat_with_image(str(file_path), message)
+        result = process_chat_with_image(
+    str(file_path),
+    message,
+    system_instruction="""
+    You are AgroGuard AI.
+    ONLY agriculture related answers allowed.
+    If user asks anything else, reply in English:
+    "Please ask agricultural questions only. I am here to help with your crops."
+    """
+)
+
         
         if not result.get("success"):
             raise HTTPException(status_code=500, detail=result.get("error"))

@@ -1,16 +1,14 @@
 from fastapi import APIRouter, Query, Body, Depends
 import math
-from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from ..utils.sms import send_sms 
 from ..database import get_db
-from ..models.sql_models import Prediction # Import DB Model
+from ..models.sql_models import Prediction 
 
 router = APIRouter(tags=["Community & Alerts"])
 
-# 💾 RADAR MEMORY (Temporary Storage for Alerts) - This remains RAM-based for instantaneous reporting
+# 💾 MEMORY STORAGE (For manual reports)
 DETECTED_OUTBREAKS = []
 
 # 📢 STATIC NEWS 
@@ -21,72 +19,177 @@ GENERAL_NOTICES = [
     "💧 **Jal Sanrakshan:** Adopt drip irrigation to save water.",
 ]
 
-# 🧮 RADAR MATHS (Distance Calculator)
 def calculate_distance(lat1, lon1, lat2, lon2):
-    R = 6371 
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
-        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    return R * c
+    if not lat1 or not lon1 or not lat2 or not lon2: return 9999
+    try:
+        R = 6371 
+        dlat = math.radians(lat2 - lat1)
+        dlon = math.radians(lon2 - lon1)
+        a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+            * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        return R * c
+    except:
+        return 9999
 
-# ==========================================
-# 🚨 REPORT ENDPOINT (Triggers Broadcast SMS)
-# ==========================================
-@router.post("/report_outbreak", tags=["Community Radar"])
+@router.post("/report_outbreak")
 async def report_disease_outbreak(
     latitude: float = Body(..., embed=True),
     longitude: float = Body(..., embed=True),
     disease_name: str = Body(..., embed=True)
 ):
-    # Save to memory (This ensures the Ticker shows it immediately)
-    new_report = {"lat": latitude, "long": longitude, "disease": disease_name}
-    DETECTED_OUTBREAKS.append(new_report)
-    
-    # 🔥 SIMULATE BULK SMS BROADCAST
-    alert_msg = f"🚨 AgroGuard RADAR: '{disease_name}' detected in your area. Check your crops immediately!"
-    send_sms("+91-98765XXXXX (Broadcast to Nearby Farmers)", alert_msg)
-    
-    return {
-        "status": "success",
-        "message": f"Alert Registered! Radar activated & SMS Broadcast sent."
+    # Add current time to manual report for consistency
+    new_report = {
+        "lat": latitude, 
+        "long": longitude, 
+        "disease": disease_name,
+        "time": datetime.now()
     }
+    DETECTED_OUTBREAKS.append(new_report)
+    return {"status": "success", "message": "Radar activated & SMS Broadcast sent."}
 
-# ==========================================
-# 📡 FETCH NEWS ENDPOINT (The Ticker)
-# ==========================================
-@router.get("/flash", tags=["News Ticker"])
+@router.get("/flash")
 async def get_flash_news(
     latitude: float = Query(..., description="User Latitude"),
-    longitude: float = Query(..., description="User Longitude")
+    longitude: float = Query(..., description="User Longitude"),
+    db: Session = Depends(get_db)
 ):
-    """
-    Returns the scrolling news feed, prioritizing nearby community risks.
-    """
     news_feed = []
     nearby_alerts = []
     
-    # Check RADAR MEMORY (Immediate alerts from the POST endpoint)
+    # 1. CHECK MANUAL REPORTS (In-Memory)
     for outbreak in DETECTED_OUTBREAKS:
         dist = calculate_distance(latitude, longitude, outbreak['lat'], outbreak['long'])
-        
-        # 5KM Risk Zone
-        if dist < 5: 
-            alert_msg = f"⚠️ SAWDHAAN: Aapke {dist:.1f} km range mein '{outbreak['disease']}' paya gaya hai. Satark rahein!"
-            if alert_msg not in nearby_alerts: nearby_alerts.append(alert_msg)
+        if dist < 15: 
+            msg = f"⚠️ ALERT: '{outbreak['disease']}' reported {dist:.1f}km away!"
+            if msg not in nearby_alerts: nearby_alerts.append(msg)
+
+    # 2. CHECK REAL DATABASE PREDICTIONS
+    # Now this will work because Prediction.timestamp exists
+    seven_days_ago = datetime.now() - timedelta(days=7)
     
-    # Add Red Alerts First
-    news_feed.extend(nearby_alerts)
+    try:
+        recent_cases = db.query(Prediction).filter(
+            Prediction.timestamp >= seven_days_ago,
+            Prediction.confidence > 0.6 
+        ).all()
+
+        for case in recent_cases:
+            if case.latitude and case.longitude:
+                dist = calculate_distance(latitude, longitude, case.latitude, case.longitude)
+                if dist < 15: 
+                    clean_name = case.disease.replace("___", " ").replace("_", " ")
+                    msg = f"⚠️ RISK: '{clean_name}' detected {dist:.1f}km away recently."
+                    if msg not in nearby_alerts: nearby_alerts.append(msg)
+    except Exception as e:
+        print(f"⚠️ Radar Error: {e}")
+        # Don't crash the whole feed if DB fails, just skip DB alerts
+        pass
+
+    # 3. PRIORITIZE ALERTS
+    if nearby_alerts:
+        news_feed.append("🔴 URGENT ALERTS NEAR YOU: ")
+        news_feed.extend(nearby_alerts)
     
-    # Add Static News Last
+    # 4. ADD GENERAL NEWS
     news_feed.extend(GENERAL_NOTICES)
 
     return {
-        "alerts_count": len(news_feed),
+        "alerts_count": len(nearby_alerts),
         "risk_detected": len(nearby_alerts) > 0,
         "scrolling_text": news_feed
     }
+
+
+# from fastapi import APIRouter, Query, Body, Depends
+# import math
+# from typing import List, Dict, Any
+# from sqlalchemy.orm import Session
+# from datetime import datetime, timedelta
+
+# from ..utils.sms import send_sms 
+# from ..database import get_db
+# from ..models.sql_models import Prediction # Import DB Model
+
+# router = APIRouter(tags=["Community & Alerts"])
+
+# # 💾 RADAR MEMORY (Temporary Storage for Alerts) - This remains RAM-based for instantaneous reporting
+# DETECTED_OUTBREAKS = []
+
+# # 📢 STATIC NEWS 
+# GENERAL_NOTICES = [
+#     "📢 **PM Kisan Yojana:** Check official portal for next installment status.",
+#     "🌾 **Soil Health:** Get your soil tested before sowing season.",
+#     "📞 **Kisan Helpline:** Call 1800-180-1551 for agriculture queries.",
+#     "💧 **Jal Sanrakshan:** Adopt drip irrigation to save water.",
+# ]
+
+# # 🧮 RADAR MATHS (Distance Calculator)
+# def calculate_distance(lat1, lon1, lat2, lon2):
+#     R = 6371 
+#     dlat = math.radians(lat2 - lat1)
+#     dlon = math.radians(lon2 - lon1)
+#     a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+#         * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+#     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+#     return R * c
+
+# # ==========================================
+# # 🚨 REPORT ENDPOINT (Triggers Broadcast SMS)
+# # ==========================================
+# @router.post("/report_outbreak", tags=["Community Radar"])
+# async def report_disease_outbreak(
+#     latitude: float = Body(..., embed=True),
+#     longitude: float = Body(..., embed=True),
+#     disease_name: str = Body(..., embed=True)
+# ):
+#     # Save to memory (This ensures the Ticker shows it immediately)
+#     new_report = {"lat": latitude, "long": longitude, "disease": disease_name}
+#     DETECTED_OUTBREAKS.append(new_report)
+    
+#     # 🔥 SIMULATE BULK SMS BROADCAST
+#     alert_msg = f"🚨 AgroGuard RADAR: '{disease_name}' detected in your area. Check your crops immediately!"
+#     send_sms("+91-98765XXXXX (Broadcast to Nearby Farmers)", alert_msg)
+    
+#     return {
+#         "status": "success",
+#         "message": f"Alert Registered! Radar activated & SMS Broadcast sent."
+#     }
+
+# # ==========================================
+# # 📡 FETCH NEWS ENDPOINT (The Ticker)
+# # ==========================================
+# @router.get("/flash", tags=["News Ticker"])
+# async def get_flash_news(
+#     latitude: float = Query(..., description="User Latitude"),
+#     longitude: float = Query(..., description="User Longitude")
+# ):
+#     """
+#     Returns the scrolling news feed, prioritizing nearby community risks.
+#     """
+#     news_feed = []
+#     nearby_alerts = []
+    
+#     # Check RADAR MEMORY (Immediate alerts from the POST endpoint)
+#     for outbreak in DETECTED_OUTBREAKS:
+#         dist = calculate_distance(latitude, longitude, outbreak['lat'], outbreak['long'])
+        
+#         # 5KM Risk Zone
+#         if dist < 5: 
+#             alert_msg = f"⚠️ SAWDHAAN: Aapke {dist:.1f} km range mein '{outbreak['disease']}' paya gaya hai. Satark rahein!"
+#             if alert_msg not in nearby_alerts: nearby_alerts.append(alert_msg)
+    
+#     # Add Red Alerts First
+#     news_feed.extend(nearby_alerts)
+    
+#     # Add Static News Last
+#     news_feed.extend(GENERAL_NOTICES)
+
+#     return {
+#         "alerts_count": len(news_feed),
+#         "risk_detected": len(nearby_alerts) > 0,
+#         "scrolling_text": news_feed
+#     }
 
 
 
