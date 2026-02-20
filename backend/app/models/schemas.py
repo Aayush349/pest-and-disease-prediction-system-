@@ -108,6 +108,67 @@ class HealthResponse(BaseModel):
     timestamp: str
 
 
+# ===============================================================
+#  AUTH SCHEMAS
+# ===============================================================
+
+class FarmerSignup(BaseModel):
+    name: str
+    phone: str
+    password: str
+    location: str
+    email: Optional[str] = None
+
+class FarmerLogin(BaseModel):
+    phone: str
+    password: str
+
+
+# ===============================================================
+#  FARMER PROFILE SCHEMAS
+# ===============================================================
+
+class FarmerProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    location: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
+    farm_size: Optional[str] = None
+    crops: Optional[List[str]] = None
+
+class FarmFieldCreate(BaseModel):
+    field_name: str
+    area_acres: Optional[float] = None
+    crop: Optional[str] = None
+    soil_type: Optional[str] = None
+    irrigation_type: Optional[str] = None
+    sowing_date: Optional[str] = None
+
+class FarmFieldResponse(BaseModel):
+    id: str
+    field_name: str
+    area_acres: Optional[float] = None
+    crop: Optional[str] = None
+    soil_type: Optional[str] = None
+    irrigation_type: Optional[str] = None
+    sowing_date: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class FarmerProfileResponse(BaseModel):
+    id: str
+    name: str
+    phone: str
+    email: Optional[str] = None
+    location: str
+    state: Optional[str] = None
+    district: Optional[str] = None
+    farm_size: Optional[str] = None
+    crops: Optional[List[str]] = None
+    created_at: str
+    fields: List[FarmFieldResponse] = []
 
 
 

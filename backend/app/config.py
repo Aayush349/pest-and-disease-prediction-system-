@@ -42,7 +42,7 @@ class Settings(BaseSettings):
 
     # ============================================================
 
-    ENVIRONMENT: str = "production"  # development/production
+    ENVIRONMENT: str = "development"  # development/production
 
     DEBUG: bool = False
 
@@ -704,6 +704,8 @@ class Settings(BaseSettings):
                 "http://localhost:8081",
 
                 "http://localhost:3001",
+
+                "http://localhost:5173",
 
             ])
 

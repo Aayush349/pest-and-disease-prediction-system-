@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles # <--- Import
 from .routers import risk
 from .routers import nutrient_advisor
 from .routers import auth # <-- Import the new router
+from .routers import farmer  # <-- Farmer profile & fields router
 
 # Import configuration
 from .config import get_settings
@@ -148,6 +149,8 @@ app.include_router(risk.router, prefix="/api/risk", tags=["Risk Prediction"])
 app.include_router(nutrient_advisor.router, prefix="/api/nutrients", tags=["Weapon 6: NPK Advisor"])
 
 app.include_router(auth.router, prefix="/api", tags=["Auth & Security"])
+
+app.include_router(farmer.router, prefix="/api", tags=["Farmer Profile"])
 
 app.include_router(mandi.router, prefix="/api/mandi", tags=["Mandi Bhav"])
 

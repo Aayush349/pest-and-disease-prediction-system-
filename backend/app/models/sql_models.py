@@ -1,6 +1,7 @@
 # backend/app/models/sql_models.py
 
-from sqlalchemy import Column, String, Float, DateTime, Integer, Text, JSON, Boolean
+from sqlalchemy import Column, String, Float, DateTime, Integer, Text, JSON, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
 from ..database import Base
@@ -15,9 +16,35 @@ class Farmer(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     name = Column(String(100), nullable=False)
     phone = Column(String(20), unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    email = Column(String(200), nullable=True)
     location = Column(String(200), nullable=False)
+    state = Column(String(100), nullable=True)
+    district = Column(String(100), nullable=True)
+    farm_size = Column(String(50), nullable=True)  # e.g. "12 Acres"
+    crops = Column(JSON, nullable=True)  # e.g. ["Wheat", "Soybean"]
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship
+    fields = relationship("FarmField", back_populates="farmer", cascade="all, delete-orphan")
+
+class FarmField(Base):
+    """Individual farm field / plot belonging to a farmer"""
+    __tablename__ = "farm_fields"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    farmer_id = Column(String(36), ForeignKey("farmers.id"), nullable=False)
+    field_name = Column(String(100), nullable=False)
+    area_acres = Column(Float, nullable=True)
+    crop = Column(String(100), nullable=True)
+    soil_type = Column(String(100), nullable=True)
+    irrigation_type = Column(String(100), nullable=True)
+    sowing_date = Column(String(50), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationship
+    farmer = relationship("Farmer", back_populates="fields")
 
 class Prediction(Base):
     """
