@@ -12,7 +12,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from pathlib import Path
 from .routers import news  # <--- Import news
-from .routers import health, disease, chat, analytics, weather, tts, news,voice  # <--- 'news' add karo
+from .routers import health, disease, chat, analytics, weather, tts, news, voice, mandi  # <--- Add mandi
 from fastapi.staticfiles import StaticFiles # <--- Import
 from .routers import risk
 from .routers import nutrient_advisor
@@ -148,6 +148,8 @@ app.include_router(risk.router, prefix="/api/risk", tags=["Risk Prediction"])
 app.include_router(nutrient_advisor.router, prefix="/api/nutrients", tags=["Weapon 6: NPK Advisor"])
 
 app.include_router(auth.router, prefix="/api", tags=["Auth & Security"])
+
+app.include_router(mandi.router, prefix="/api/mandi", tags=["Mandi Bhav"])
 
 # ============== Static File Mounts ==============
 app.mount("/uploads/images", StaticFiles(directory="uploads/images"), name="images")

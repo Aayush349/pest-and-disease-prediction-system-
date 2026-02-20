@@ -418,6 +418,14 @@ class Settings(BaseSettings):
     MARKET_PRICE_API_KEY: Optional[str] = ""
 
    
+    # ============================================================
+    # 📱 Twilio WhatsApp Notifications
+    # ============================================================
+    # Twilio configuration for sending WhatsApp notifications
+    TWILIO_ACCOUNT_SID: Optional[str] = ""
+    TWILIO_AUTH_TOKEN: Optional[str] = ""
+    TWILIO_WHATSAPP_NUMBER: Optional[str] = ""  # Format: whatsapp:+14155238886
+   
 
     # ============================================================
 

@@ -93,10 +93,19 @@ def get_satellite_health(lat: float, lon: float):
         val = stats.get('NDVI', 0)
         if val is None: val = 0.0
 
-        # 7. Determine Health Status
-        if val > 0.5: status = "Healthy"
-        elif val > 0.3: status = "Moderate Stress"
-        else: status = "High Stress"
+        # 7. Determine Health Status (FIXED: Adjusted for realistic classification)
+        # Urban/Concrete: NDVI < 0.10 (buildings, roads, complete barren land)
+        # Stressed/Bare Soil: 0.10 <= NDVI < 0.40 (stressed crops, fallow fields, dry farmland)
+        # Healthy: NDVI >= 0.40 (actively growing vegetation)
+        # 
+        # NOTE: Agricultural land even during dry season typically has NDVI > 0.10
+        # Pure concrete/asphalt rarely exceeds 0.08-0.10
+        if val < 0.10:
+            status = "Urban"
+        elif val < 0.40:
+            status = "Stressed" 
+        else:
+            status = "Healthy"
 
         return {
             "ndvi": round(val, 3), 

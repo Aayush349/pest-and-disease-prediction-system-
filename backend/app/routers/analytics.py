@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from pydantic import BaseModel
@@ -6,8 +6,10 @@ from datetime import datetime, timedelta
 
 from ..database import get_db
 from ..models.sql_models import Prediction # Import Prediction Model
+from ..utils.logger import Logger  # ✅ NEW: For logging
 
 router = APIRouter(tags=["Analytics & Maps"])
+logger = Logger(__name__)  # ✅ NEW: Initialize logger
 
 # Schema for Map Data (Lightweight for fast loading)
 class HeatmapPoint(BaseModel):
@@ -20,45 +22,75 @@ class HeatmapPoint(BaseModel):
     created_at: datetime
 
 @router.get("/heatmap", response_model=List[HeatmapPoint])
-async def get_heatmap_data(db: Session = Depends(get_db)):
+async def get_heatmap_data(
+    db: Session = Depends(get_db),
+    show_urban: bool = Query(False, description="Show urban areas on map")  # ✅ NEW: Filter toggle
+):
     """
     RETURNS LIVE DATA FOR MAP (Heatmap Data Source).
     Includes logic for SQLite (Local) fetching + NDVI Status Calculation.
+    Filters urban areas by default unless explicitly requested.
     """
     try:
-        # 1. Filters (Keep data clean for judges)
+        # 1. Filters
         start_date = datetime.now() - timedelta(days=30)
         
-        # 2. Query Database
-        points = db.query(Prediction).filter(
+        # 2. Base Query
+        query = db.query(Prediction).filter(
             Prediction.latitude.isnot(None),
             Prediction.longitude.isnot(None),
             Prediction.created_at >= start_date,
-        ).all()
+        )
         
-        # 3. Format Data & Calculate Status (The New Logic)
+        # ✅ FIXED: Filter out urban areas unless explicitly requested
+        if not show_urban:
+            # Filter by status field (preferred) or NDVI threshold (fallback)
+            # Updated threshold: 0.10 (was 0.22) to match corrected classification
+            query = query.filter(
+                (Prediction.status != "Urban") | (Prediction.status.is_(None)),
+                (Prediction.ndvi_score >= 0.10) | (Prediction.ndvi_score.is_(None))
+            )
+        
+        # 3. Filter out healthy/unknown predictions and low confidence
+        query = query.filter(
+            Prediction.disease != "Healthy",
+            Prediction.disease != "Unknown",
+            Prediction.confidence >= 0.3  # Minimum 30% confidence
+        )
+        
+        points = query.all()
+        
+        # 4. Format Data
         heatmap_data = []
         for p in points:
             # --- NDVI / STATUS LOGIC ---
-            # Default values agar DB mein null ho
-            ndvi_val = p.ndvi_score if hasattr(p, 'ndvi_score') and p.ndvi_score is not None else 0.0
+            # Use stored NDVI or default to 0
+            ndvi_val = p.ndvi_score if p.ndvi_score is not None else 0.0
             
-            status_label = "Healthy"
-            if ndvi_val < 0.22:
-                status_label = "Urban"
-            elif ndvi_val < 0.45:
-                status_label = "Stressed"
+            # Use stored status or calculate from NDVI
+            if p.status:
+                status_label = p.status
+            else:
+                # Fallback: calculate from NDVI using FIXED thresholds
+                if ndvi_val < 0.10:
+                    status_label = "Urban"
+                elif ndvi_val < 0.40:
+                    status_label = "Stressed"
+                else:
+                    status_label = "Healthy"
             
             heatmap_data.append({
                 "latitude": p.latitude,
                 "longitude": p.longitude,
                 "disease": p.disease,
                 "confidence": p.confidence or 0.0,
-                "ndvi": ndvi_val,           # ✅ Frontend needs this
-                "status": status_label,     # ✅ Frontend needs this
+                "ndvi": ndvi_val,           # ✅ Frontend compatibility
+                "ndvi_score": ndvi_val,     # ✅ Alternative naming
+                "status": status_label,     # ✅ Urban/Stressed/Healthy
                 "created_at": p.created_at
             })
         
+        logger.info(f"📊 Heatmap data points: {len(heatmap_data)} (show_urban={show_urban})")
         return heatmap_data
         
     except Exception as e:

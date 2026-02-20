@@ -29,3 +29,6 @@ passlib[bcrypt]==1.7.4
 
 # Monitoring
 python-json-logger==2.0.7
+
+# WhatsApp Notifications
+twilio>=8.10.0

@@ -41,6 +41,8 @@ from ..models.sql_models import Prediction
 from ..database import get_db
 from ..utils.logger import Logger
 from ..utils.pdf_generator import generate_prescription_pdf
+from ..utils.ndvi_fetcher import get_satellite_health  # ✅ NEW: NDVI Service
+from ..services.whatsapp_service import send_whatsapp_notification  # ✅ NEW: WhatsApp Notifications
 
 # ================= INIT =================
 router = APIRouter(tags=["Disease Detection"])
@@ -265,7 +267,10 @@ async def process_gemini_response(
     farmer_id: str,
     latitude: Optional[float],
     longitude: Optional[float],
-    db: Session
+    db: Session,
+    ndvi_score: float = 0.0,  # ✅ NEW: NDVI parameters
+    status: str = "Unknown",
+    is_agricultural: bool = True
 ) -> Dict[str, Any]:
     """Process Gemini response with full feature compatibility."""
     try:
@@ -319,7 +324,11 @@ async def process_gemini_response(
                 image_path=str(file_path),
                 knowledge_source="gemini",
                 fallback_reason=gemini_result.get("fallback_reason", "Low confidence"),
-                advisory_source=advisory_source
+                advisory_source=advisory_source,
+                # ✅ NEW: NDVI fields
+                ndvi_score=ndvi_score,
+                status=status,
+                is_agricultural=is_agricultural
             )
             db.add(prediction)
             db.commit()
@@ -388,6 +397,8 @@ async def predict_disease(
     longitude: Optional[float] = Form(None),
     farmer_id: str = Form("guest_user"),
     crop_stage: str = Form("Vegetative"),
+    phone_number: Optional[str] = Form(None),  # ✅ NEW: WhatsApp notification
+    email: Optional[str] = Form(None),  # ✅ NEW: Email notification (processed in frontend)
     db: Session = Depends(get_db),
 ):
     """Main disease prediction endpoint with hybrid intelligence."""
@@ -408,6 +419,48 @@ async def predict_disease(
                 f.write(chunk)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"File save error: {e}")
+    
+    # ---------- NDVI CALCULATION ----------
+    ndvi_score = 0.0
+    status = "Unknown"
+    is_agricultural = True
+    
+    if latitude and longitude:
+        try:
+            # Get NDVI from satellite
+            ndvi_result = get_satellite_health(latitude, longitude)
+            ndvi_score = ndvi_result.get("ndvi", 0.0)
+            
+            # ✅ FIXED: Adjusted thresholds to prevent farmland misclassification
+            # Urban/Concrete: NDVI < 0.10 (pure concrete, asphalt)
+            # Stressed/Bare: 0.10-0.40 (stressed crops, fallow fields, dry season)
+            # Healthy: > 0.40 (actively growing crops)
+            if ndvi_score < 0.10:
+                status = "Urban"
+                is_agricultural = False
+            elif ndvi_score < 0.40:
+                status = "Stressed"
+            else:
+                status = "Healthy"
+                
+            logger.success(f"✓ NDVI calculated: {ndvi_score} ({status})")
+            
+        except Exception as e:
+            logger.warning(f"⚠ NDVI calculation failed: {e}")
+            # Fallback logic: Use latitude-based heuristics for Indian agricultural zones
+            if latitude and longitude:
+                # Check if coordinates are likely agricultural (rural India)
+                # Simple check: between 8°N to 37°N latitude (Indian subcontinent)
+                if 8.0 < latitude < 37.0:
+                    ndvi_score = 0.25  # Assume stressed/fallow farm (dry season typical)
+                    status = "Stressed"
+                    is_agricultural = True
+                    logger.info(f"🌾 NDVI fallback: Assumed agricultural zone based on coordinates")
+                else:
+                    ndvi_score = 0.05  # Assume urban
+                    status = "Urban"
+                    is_agricultural = False
+                    logger.info(f"🏙 NDVI fallback: Assumed urban zone based on coordinates")
     
     # ---------- DUAL-CORE EDGE AI DETECTION ----------
     logger.info(f"🚀 Running Dual-Core Engine. User Crop: {crop_type}")
@@ -465,7 +518,11 @@ async def predict_disease(
                     farmer_id=farmer_id,
                     latitude=latitude,
                     longitude=longitude,
-                    db=db
+                    db=db,
+                    # ✅ NEW: Pass NDVI data
+                    ndvi_score=ndvi_score,
+                    status=status,
+                    is_agricultural=is_agricultural
                 )
         except Exception as gemini_error:
             logger.error(f"Gemini fallback also failed: {gemini_error}")
@@ -532,6 +589,18 @@ async def predict_disease(
     # ---------- Database Save ----------
     prediction = None
     try:
+        # ✅ CRITICAL FIX: Override urban classification if crop disease detected
+        # Logic: If AI detected a CROP disease, it CANNOT be urban/concrete
+        if status == "Urban" and disease not in ["Unknown", "Healthy", "NO CROP", "NO CROP/URBAN"]:
+            logger.warning(f"⚠ Urban classification overridden: Crop disease '{disease}' detected")
+            status = "Stressed"  # Reclassify as stressed agricultural land
+            is_agricultural = True
+            logger.info(f"✅ Reclassified as Stressed Agricultural (NDVI={ndvi_score}, Disease={disease})")
+        
+        # Log if disease detected in originally-classified urban zone (should be rare now)
+        if status == "Urban" and disease != "Unknown":
+            logger.info(f"⚠ Disease detected in urban area: {disease} (may be garden/park vegetation)")
+        
         prediction = Prediction(
             farmer_id=farmer_id,
             disease=disease,
@@ -547,12 +616,16 @@ async def predict_disease(
             knowledge_source="dual_yolo",
             fallback_reason="" if not use_gemini else gemini_reason,
             model_used=used_model,
-            advisory_source=advisory_source
+            advisory_source=advisory_source,
+            # ✅ NEW: NDVI fields
+            ndvi_score=ndvi_score,
+            status=status,
+            is_agricultural=is_agricultural
         )
         db.add(prediction)
         db.commit()
         db.refresh(prediction)
-        logger.success(f"Dual-core analytics saved for ID: {farmer_id}, Model: {used_model}")
+        logger.success(f"Dual-core analytics saved for ID: {farmer_id}, Model: {used_model}, NDVI: {ndvi_score}")
     except Exception as e:
         logger.error(f"DB save failed: {e}")
     
@@ -584,6 +657,41 @@ async def predict_disease(
     except Exception as e:
         logger.error(f"PDF generation failed: {e}")
     
+    # ---------- WHATSAPP NOTIFICATION ----------
+    # ✅ NEW: Send WhatsApp notification if phone number provided
+    notification_status = {
+        "whatsapp_sent": False,
+        "whatsapp_error": None,
+        "email_ready": bool(email)  # Email will be sent by frontend using EmailJS
+    }
+    
+    if phone_number:
+        try:
+            logger.info(f"📱 Attempting WhatsApp notification to {phone_number}")
+            whatsapp_result = send_whatsapp_notification(
+                phone_number=phone_number,
+                disease=disease_clean,
+                confidence=confidence,
+                treatment=treatment,
+                language=language
+            )
+            
+            notification_status["whatsapp_sent"] = whatsapp_result["success"]
+            notification_status["whatsapp_message"] = whatsapp_result["message"]
+            
+            if not whatsapp_result["success"]:
+                notification_status["whatsapp_error"] = whatsapp_result.get("error", "Unknown error")
+                logger.warning(f"⚠️ WhatsApp notification failed: {whatsapp_result['message']}")
+            else:
+                logger.success(f"✅ WhatsApp notification sent successfully to {phone_number}")
+                
+        except Exception as notification_error:
+            # CRITICAL: Never crash the app due to notification failures
+            error_msg = str(notification_error)
+            notification_status["whatsapp_error"] = error_msg
+            notification_status["whatsapp_message"] = "SMS not sent due to technical error"
+            logger.error(f"❌ Unexpected WhatsApp notification error: {error_msg}")
+    
     # ---------- FINAL RESPONSE ----------
     # Create flat dictionaries for response (Pydantic expects Dict[str, float])
     all_predictions_flat = {
@@ -611,8 +719,11 @@ async def predict_disease(
         "model_used": used_model,
         "fallback_triggered": use_gemini,
         "fallback_reason": gemini_reason if use_gemini else "",
+        "notification_status": notification_status,  # ✅ NEW: Notification status
         "success": True,
     }
+
+
 
 
 

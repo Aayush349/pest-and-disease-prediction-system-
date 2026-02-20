@@ -1,6 +1,6 @@
 # backend/app/models/sql_models.py
 
-from sqlalchemy import Column, String, Float, DateTime, Integer, Text, JSON
+from sqlalchemy import Column, String, Float, DateTime, Integer, Text, JSON, Boolean
 from datetime import datetime
 import uuid
 from ..database import Base
@@ -39,6 +39,9 @@ class Prediction(Base):
     ndvi_score = Column(Float, nullable=True)
     field_health = Column(String(100), nullable=True)
     combined_risk = Column(String(100), nullable=True)
+    # ✅ NEW: NDVI-based classification fields
+    status = Column(String(50), nullable=True)  # "Urban", "Stressed", "Healthy"
+    is_agricultural = Column(Boolean, default=True)  # True for farms, False for urban
     description = Column(Text, nullable=True)
     fallback_reason = Column(Text)
     advisory_source = Column(String(100), nullable=True)

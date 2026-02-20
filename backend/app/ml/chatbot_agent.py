@@ -1,7 +1,7 @@
 """
 Chatbot Agent
 Combines disease detection + LLM for intelligent responses
-FIXED: Safe dict access + better error handling
+FIXED: Safe dict access + f-string safety
 """
 
 from pathlib import Path
@@ -13,190 +13,424 @@ logger = Logger(__name__)
 
 def classify_disease_wrapper(image_path: str):
     """Wrapper for disease classification using dual_classifier"""
-    res = dual_bot.predict(image_path)
-    return res
+    try:
+        return dual_bot.predict(image_path)
+    except Exception as e:
+        logger.error(f"Classification error: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "disease": "Unknown",
+            "confidence": 0.0
+        }
+
+
+
+def process_chat_without_image(
+    user_message: str,
+    system_instruction: str | None = None
+):
+    """
+    Process text-only chat (no image context)
+    """
+
+    try:
+        if not user_message or not user_message.strip():
+            return {
+                "success": False,
+                "error": "Empty message"
+            }
+
+        default_system_prompt = """
+You are an agricultural expert AI helping farmers.
+
+STRICT RULES:
+1. Answer ONLY agriculture-related questions (crops, soil, fertilizer, pests, diseases, irrigation).
+2. If the question is NOT agriculture-related, reply exactly:
+"Please ask agricultural questions only. I am here to help with your crops."
+
+Use simple, farmer-friendly language.
+"""
+
+        final_system_prompt = system_instruction or default_system_prompt
+
+        logger.info("Querying LLM (text-only chat)...")
+
+        llm_response = query_llm(
+            user_message=user_message,
+            system_prompt=final_system_prompt
+        )
+
+        if not llm_response.get("success", False):
+            return {
+                "success": False,
+                "error": "LLM query failed",
+                "provider": llm_response.get("provider", "unknown")
+            }
+
+        return {
+            "success": True,
+            "ai_response": llm_response.get("text", "").strip(),
+            "provider": llm_response.get("provider", "unknown"),
+            "tokens_used": llm_response.get("tokens", 0)
+        }
+
+    except Exception as e:
+        logger.error(f"Text chat error: {str(e)}", exc_info=True)
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+
 
 def process_chat_with_image(
     image_path: str,
     user_message: str,
-    system_instruction: str = None
+    system_instruction: str | None = None
 ):
     """
     Process image + user message with disease context
-    
-    Returns: {
-        "disease": "Tomato___Early_blight",
-        "confidence": 0.2495,
-        "ai_response": "Based on your image...",
-        "treatment": [...],
-        "prevention": [...],
-        "warning": "...",
-        "provider": "openai",
-        "success": True
-    }
     """
-    
+
     try:
-        # Step 1: Classify disease from image
-        logger.info(f"Classifying disease from image...")
+        # Step 1: Disease classification
+        logger.info(f"Classifying disease from image: {image_path}")
         disease_result = classify_disease_wrapper(image_path)
-        
-        if not disease_result.get("success"):
-            logger.error("Disease classification failed")
+
+        if not disease_result.get("success", False):
             return {
                 "error": "Could not classify disease",
                 "detail": disease_result.get("error", "Unknown error"),
                 "success": False
             }
-        
-        # ✅ FIXED: Safe dict access with defaults
+
         disease_name = disease_result.get("disease", "Unknown")
         confidence = disease_result.get("confidence", 0.0)
-        treatment = disease_result.get("treatment", ["Consult agricultural expert"])
-        prevention = disease_result.get("prevention", ["Monitor plant regularly"])
+        warning = disease_result.get("warning", "")
+
+        treatment = disease_result.get("treatment", [])
+        if not isinstance(treatment, list):
+            treatment = [str(treatment)] if treatment else ["Consult agricultural expert"]
+
+        prevention = disease_result.get("prevention", [])
+        if not isinstance(prevention, list):
+            prevention = [str(prevention)] if prevention else ["Monitor plant regularly"]
+
         top5 = disease_result.get("top5", [])
-        warning = disease_result.get("warning", None)
-        
+        if isinstance(top5, dict):
+            top5 = [{"disease": k, "probability": v} for k, v in top5.items()]
+        elif not isinstance(top5, list):
+            top5 = []
+
         logger.success(f"✓ Detected: {disease_name} ({confidence*100:.2f}%)")
-        
-        # Step 2: Build context-aware prompt
+
+        # Step 2: Prepare prompt-safe text (NO f-string logic inside)
+        treatment_text = "\n".join(f"• {t}" for t in treatment[:5])
+        prevention_text = "\n".join(f"• {p}" for p in prevention[:5])
+        warning_text = f"⚠️ {warning}" if warning else ""
+
+        alternative_text = ""
+        if len(top5) > 1:
+            alternatives = []
+            for i, p in enumerate(top5[1:4]):
+                if isinstance(p, dict):
+                    alt_name = p.get("disease", f"Alternative {i+1}")
+                    alt_prob = p.get("probability", 0.0)
+                    alternatives.append(f"• {alt_name} ({alt_prob*100:.1f}%)")
+            if alternatives:
+                alternative_text = "\nALTERNATIVE POSSIBILITIES:\n" + "\n".join(alternatives)
+
+        # Step 3: Final system prompt (SAFE)
         system_prompt = f"""
 You are an agricultural expert helping Indian farmers with crop diseases.
 
 DETECTED DISEASE: {disease_name}
 Confidence Level: {confidence*100:.1f}%
-{f"⚠️ {warning}" if warning else ""}
+{warning_text}
 
 RECOMMENDED TREATMENT:
-{chr(10).join(f'• {t}' for t in treatment[:5])}
+{treatment_text}
 
 PREVENTION METHODS:
-{chr(10).join(f'• {p}' for p in prevention[:5])}
-
-ALTERNATIVE POSSIBILITIES:
-{chr(10).join(f'• {p["disease"]} ({p["probability"]*100:.1f}%)' for p in top5[1:4])}
+{prevention_text}
+{alternative_text}
 
 Farmer's Question: {user_message}
 
-IMPORTANT: Return ONLY JSON, no conversational filler.
-
-Please provide:
-1. CLEAR explanation of the disease
-2. EXACT treatment steps with timing
-3. PREVENTION methods
-4. WHEN to seek expert help
-
-Keep language simple - farmer-friendly, not technical.
-Include local remedies if known.
+IMPORTANT:
+- Respond in plain text (not JSON)
+- Use simple farmer-friendly language
+- Include exact treatment timing
+- Mention when to seek expert help
+- Suggest local remedies if applicable
 """
-        
-        # Step 3: Build messages (allow optional injected system instruction)
-        messages = []
 
-        if system_instruction:
-            messages.append({
-                "role": "system",
-                "content": system_instruction
-            })
+        final_system_prompt = system_instruction or system_prompt
 
-        messages.append({
-            "role": "user",
-            "content": user_message
-        })
+        logger.info("Querying LLM...")
+        llm_response = query_llm(
+            user_message=user_message,
+            system_prompt=final_system_prompt
+        )
 
-        # Step 4: Query LLM with full context
-        logger.info(f"Querying LLM for response...")
-        # If a caller provided a system_instruction, prefer it; else use the generated system_prompt
-        llm_response = query_llm(user_message, system_instruction if system_instruction else system_prompt)
-        
-        if not llm_response.get("success"):
-            logger.error("LLM query failed")
-            
-            # ✅ FIXED: Return classification result even if LLM fails
+        if not llm_response.get("success", False):
             fallback_response = f"""
 I detected {disease_name} with {confidence*100:.1f}% confidence.
 
 Treatment:
-{chr(10).join(f'{i+1}. {t}' for i, t in enumerate(treatment[:5]))}
+{treatment_text}
 
 Prevention:
-{chr(10).join(f'{i+1}. {p}' for i, p in enumerate(prevention[:5]))}
+{prevention_text}
 
-{warning or ''}
+{warning_text}
 
-Please consult with an agricultural expert for detailed advice.
+Please consult an agricultural expert for detailed advice.
 """
-            
             return {
                 "disease": disease_name,
                 "confidence": confidence,
-                "ai_response": fallback_response,
+                "ai_response": fallback_response.strip(),
                 "treatment": treatment,
                 "prevention": prevention,
                 "warning": warning,
                 "provider": "fallback",
                 "success": True
             }
-        
-        logger.success(f"✓ AI responded via {llm_response['provider']}")
-        
+
+        logger.success(f"✓ AI responded via {llm_response.get('provider', 'unknown')}")
+
         return {
             "disease": disease_name,
             "confidence": confidence,
-            "ai_response": llm_response["text"],
+            "ai_response": llm_response.get("text", "").strip(),
             "treatment": treatment,
             "prevention": prevention,
             "warning": warning,
-            "provider": llm_response["provider"],
+            "provider": llm_response.get("provider", "unknown"),
             "tokens_used": llm_response.get("tokens", 0),
             "success": True
         }
-    
+
     except Exception as e:
-        logger.error(f"Chat processing error: {str(e)}")
+        logger.error(f"Chat processing error: {str(e)}", exc_info=True)
         return {
-            "error": str(e),
+            "error": f"Processing error: {str(e)}",
             "success": False
         }
 
-def process_chat_without_image(user_message: str):
-    """
-    Process text-only chat (general farming advice)
-    """
+
+
+
+# """
+# Chatbot Agent
+# Combines disease detection + LLM for intelligent responses
+# FIXED: Safe dict access + better error handling
+# """
+
+# from pathlib import Path
+# from ..utils.logger import Logger
+# from .dual_classifier import dual_bot
+# from .llm_provider import query_llm
+
+# logger = Logger(__name__)
+
+# def classify_disease_wrapper(image_path: str):
+#     """Wrapper for disease classification using dual_classifier"""
+#     res = dual_bot.predict(image_path)
+#     return res
+
+# def process_chat_with_image(
+#     image_path: str,
+#     user_message: str,
+#     system_instruction: str = None
+# ):
+#     """
+#     Process image + user message with disease context
     
-    try:
-        system_prompt = """
-You are an agricultural expert helping Indian farmers.
-
-The farmer is asking a general farming question (no image provided).
-
-IMPORTANT: Return ONLY JSON, no conversational filler.
-
-Provide:
-1. Clear, practical advice
-2. Local farming practices if relevant
-3. When to seek expert help
-4. Common mistakes to avoid
-
-Keep language simple - farmer-friendly.
-"""
-        
-        logger.info("Querying LLM for text-only response...")
-        llm_response = query_llm(user_message, system_prompt)
-        
-        return {
-            "ai_response": llm_response.get("text", "Unable to generate response"),
-            "provider": llm_response.get("provider", "error"),
-            "tokens_used": llm_response.get("tokens", 0),
-            "success": llm_response.get("success", False)
-        }
+#     Returns: {
+#         "disease": "Tomato___Early_blight",
+#         "confidence": 0.2495,
+#         "ai_response": "Based on your image...",
+#         "treatment": [...],
+#         "prevention": [...],
+#         "warning": "...",
+#         "provider": "openai",
+#         "success": True
+#     }
+#     """
     
-    except Exception as e:
-        logger.error(f"Chat error: {str(e)}")
-        return {
-            "error": str(e),
-            "success": False
-        }
+#     try:
+#         # Step 1: Classify disease from image
+#         logger.info(f"Classifying disease from image...")
+#         disease_result = classify_disease_wrapper(image_path)
+        
+#         if not disease_result.get("success"):
+#             logger.error("Disease classification failed")
+#             return {
+#                 "error": "Could not classify disease",
+#                 "detail": disease_result.get("error", "Unknown error"),
+#                 "success": False
+#             }
+        
+#         # ✅ FIXED: Safe dict access with defaults
+#         disease_name = disease_result.get("disease", "Unknown")
+#         confidence = disease_result.get("confidence", 0.0)
+#         treatment = disease_result.get("treatment", ["Consult agricultural expert"])
+#         prevention = disease_result.get("prevention", ["Monitor plant regularly"])
+#         top5 = disease_result.get("top5", [])
+#         warning = disease_result.get("warning", None)
+        
+#         logger.success(f"✓ Detected: {disease_name} ({confidence*100:.2f}%)")
+        
+#         # Step 2: Build context-aware prompt
+#         system_prompt = f"""
+# You are an agricultural expert helping Indian farmers with crop diseases.
+
+# DETECTED DISEASE: {disease_name}
+# Confidence Level: {confidence*100:.1f}%
+# {f"⚠️ {warning}" if warning else ""}
+
+# RECOMMENDED TREATMENT:
+# {chr(10).join(f'• {t}' for t in treatment[:5])}
+
+# PREVENTION METHODS:
+# {chr(10).join(f'• {p}' for p in prevention[:5])}
+
+# ALTERNATIVE POSSIBILITIES:
+# {chr(10).join(f'• {p["disease"]} ({p["probability"]*100:.1f}%)' for p in top5[1:4])}
+
+# Farmer's Question: {user_message}
+
+# IMPORTANT: Return ONLY JSON, no conversational filler.
+
+# Please provide:
+# 1. CLEAR explanation of the disease
+# 2. EXACT treatment steps with timing
+# 3. PREVENTION methods
+# 4. WHEN to seek expert help
+
+# Keep language simple - farmer-friendly, not technical.
+# Include local remedies if known.
+# """
+        
+#         # Step 3: Build messages (allow optional injected system instruction)
+#         messages = []
+
+#         if system_instruction:
+#             messages.append({
+#                 "role": "system",
+#                 "content": system_instruction
+#             })
+
+#         messages.append({
+#             "role": "user",
+#             "content": user_message
+#         })
+
+#         # Step 4: Query LLM with full context
+#         logger.info(f"Querying LLM for response...")
+#         # If a caller provided a system_instruction, prefer it; else use the generated system_prompt
+#         llm_response = query_llm(user_message, system_instruction if system_instruction else system_prompt)
+        
+#         if not llm_response.get("success"):
+#             logger.error("LLM query failed")
+            
+#             # ✅ FIXED: Return classification result even if LLM fails
+#             fallback_response = f"""
+# I detected {disease_name} with {confidence*100:.1f}% confidence.
+
+# Treatment:
+# {chr(10).join(f'{i+1}. {t}' for i, t in enumerate(treatment[:5]))}
+
+# Prevention:
+# {chr(10).join(f'{i+1}. {p}' for i, p in enumerate(prevention[:5]))}
+
+# {warning or ''}
+
+# Please consult with an agricultural expert for detailed advice.
+# """
+            
+#             return {
+#                 "disease": disease_name,
+#                 "confidence": confidence,
+#                 "ai_response": fallback_response,
+#                 "treatment": treatment,
+#                 "prevention": prevention,
+#                 "warning": warning,
+#                 "provider": "fallback",
+#                 "success": True
+#             }
+        
+#         logger.success(f"✓ AI responded via {llm_response['provider']}")
+        
+#         return {
+#             "disease": disease_name,
+#             "confidence": confidence,
+#             "ai_response": llm_response["text"],
+#             "treatment": treatment,
+#             "prevention": prevention,
+#             "warning": warning,
+#             "provider": llm_response["provider"],
+#             "tokens_used": llm_response.get("tokens", 0),
+#             "success": True
+#         }
+    
+#     except Exception as e:
+#         logger.error(f"Chat processing error: {str(e)}")
+#         return {
+#             "error": str(e),
+#             "success": False
+#         }
+
+# def process_chat_without_image(user_message: str, system_instruction: str = None):
+#     """
+#     Process text-only chat (general farming advice)
+    
+#     Args:
+#         user_message: The user's question/message
+#         system_instruction: Optional system prompt override
+#     """
+    
+#     try:
+#         # Default system prompt if none provided
+#         default_system_prompt = """
+# You are an agricultural expert helping Indian farmers.
+
+# The farmer is asking a general farming question (no image provided).
+
+# IMPORTANT: Return ONLY JSON, no conversational filler.
+
+# Provide:
+# 1. Clear, practical advice
+# 2. Local farming practices if relevant
+# 3. When to seek expert help
+# 4. Common mistakes to avoid
+
+# Keep language simple - farmer-friendly.
+# """
+        
+#         # Use provided system_instruction or default
+#         system_prompt = system_instruction if system_instruction else default_system_prompt
+        
+#         logger.info("Querying LLM for text-only response...")
+#         llm_response = query_llm(user_message, system_prompt)
+        
+#         return {
+#             "ai_response": llm_response.get("text", "Unable to generate response"),
+#             "provider": llm_response.get("provider", "error"),
+#             "tokens_used": llm_response.get("tokens", 0),
+#             "success": llm_response.get("success", False)
+#         }
+    
+#     except Exception as e:
+#         logger.error(f"Chat error: {str(e)}")
+#         return {
+#             "error": str(e),
+#             "success": False
+#         }
 
 
 
