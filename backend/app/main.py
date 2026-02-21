@@ -18,6 +18,7 @@ from .routers import risk
 from .routers import nutrient_advisor
 from .routers import auth # <-- Import the new router
 from .routers import farmer  # <-- Farmer profile & fields router
+from .routers import pest_forecast  # <-- Pest & Disease Forecast
 
 # Import configuration
 from .config import get_settings
@@ -153,6 +154,8 @@ app.include_router(auth.router, prefix="/api", tags=["Auth & Security"])
 app.include_router(farmer.router, prefix="/api", tags=["Farmer Profile"])
 
 app.include_router(mandi.router, prefix="/api/mandi", tags=["Mandi Bhav"])
+
+app.include_router(pest_forecast.router, prefix="/api/pest", tags=["Pest & Disease Forecast"])
 
 # ============== Static File Mounts ==============
 app.mount("/uploads/images", StaticFiles(directory="uploads/images"), name="images")

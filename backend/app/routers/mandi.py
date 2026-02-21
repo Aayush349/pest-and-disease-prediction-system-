@@ -46,7 +46,7 @@ def fetch_mandi_prices(
     commodity: Optional[str] = None,
     state: Optional[str] = None,
     district: Optional[str] = None,
-    limit: int = 50
+    limit: int = 20
 ) -> Dict[str, Any]:
     """Fetch mandi prices from OGD platform with caching"""
 
@@ -73,7 +73,7 @@ def fetch_mandi_prices(
 
     try:
         logger.info(f"OGD FETCH: commodity={commodity}, state={state}, district={district}, limit={limit}")
-        response = requests.get(url, params=params, timeout=30)
+        response = requests.get(url, params=params, timeout=300)
         response.raise_for_status()
         data = response.json()
         logger.success(f"✓ Fetched {len(data.get('records', []))} price records")

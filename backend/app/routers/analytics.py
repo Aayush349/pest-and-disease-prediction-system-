@@ -19,6 +19,8 @@ class HeatmapPoint(BaseModel):
     confidence: float
     ndvi: float = 0.0      # ✅ NEW: For Color Logic
     status: str = "Healthy" # ✅ NEW: For Legend (Urban/Stress/Healthy)
+    location_name: str = ""  # ✅ Reverse-geocoded place name
+    zone_radius: int = 10000 # ✅ 10km zone radius in meters
     created_at: datetime
 
 @router.get("/heatmap", response_model=List[HeatmapPoint])
@@ -87,6 +89,8 @@ async def get_heatmap_data(
                 "ndvi": ndvi_val,           # ✅ Frontend compatibility
                 "ndvi_score": ndvi_val,     # ✅ Alternative naming
                 "status": status_label,     # ✅ Urban/Stressed/Healthy
+                "location_name": getattr(p, 'location_name', '') or '',  # ✅ Place name
+                "zone_radius": 10000,       # ✅ 10km zone in meters
                 "created_at": p.created_at
             })
         

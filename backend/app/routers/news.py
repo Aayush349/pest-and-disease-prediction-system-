@@ -76,9 +76,13 @@ async def get_flash_news(
 
         for case in recent_cases:
             if case.latitude and case.longitude:
+                clean_name = case.disease.replace("___", " ").replace("_", " ")
+                # Skip non-disease detections
+                lower_name = clean_name.lower()
+                if any(skip in lower_name for skip in ["no crop", "urban", "healthy", "background", "unknown"]):
+                    continue
                 dist = calculate_distance(latitude, longitude, case.latitude, case.longitude)
                 if dist < 15: 
-                    clean_name = case.disease.replace("___", " ").replace("_", " ")
                     msg = f"⚠️ RISK: '{clean_name}' detected {dist:.1f}km away recently."
                     if msg not in nearby_alerts: nearby_alerts.append(msg)
     except Exception as e:

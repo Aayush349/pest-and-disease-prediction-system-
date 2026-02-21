@@ -23,6 +23,8 @@ class Farmer(Base):
     district = Column(String(100), nullable=True)
     farm_size = Column(String(50), nullable=True)  # e.g. "12 Acres"
     crops = Column(JSON, nullable=True)  # e.g. ["Wheat", "Soybean"]
+    latitude = Column(Float, nullable=True)   # GPS for neighbor alerts
+    longitude = Column(Float, nullable=True)  # GPS for neighbor alerts
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -77,6 +79,7 @@ class Prediction(Base):
     treatment = Column(JSON, nullable=True)
     prevention = Column(JSON, nullable=True)
     image_path = Column(String(500), nullable=True)
+    location_name = Column(String(500), nullable=True)  # Reverse-geocoded place name
     created_at = Column(DateTime, default=datetime.utcnow)
     crop_stage = Column(String, nullable=True) # <--- Add this line
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
